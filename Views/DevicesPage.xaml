@@ -1,0 +1,81 @@
+<v:NotchPage x:Class="Notch.Views.DevicesPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:v="clr-namespace:Notch.Views">
+    <Grid VerticalAlignment="Top">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="42"/>    <!-- title -->
+            <RowDefinition Height="60"/>    <!-- Wi-Fi and Bluetooth switches -->
+            <RowDefinition Height="Auto"/>  <!-- connected devices -->
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="HeaderText" Text="Connections" FontSize="13" FontWeight="SemiBold"
+                   Margin="20,12,12,0" VerticalAlignment="Center"/>
+
+        <!-- Click a tile to switch the radio on or off. The arrow opens Windows' own list. -->
+        <Grid Grid.Row="1" Margin="16,0,16,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border x:Name="WifiTile" Style="{StaticResource Tile}" MouseLeftButtonUp="Wifi_Click">
+                <Grid Margin="10,0,4,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border x:Name="WifiDot" Width="32" Height="32" CornerRadius="16" VerticalAlignment="Center">
+                        <TextBlock Text="&#xE701;" FontFamily="{StaticResource IconFont}" FontSize="15"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Wi-Fi" FontSize="13" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="WifiStatus" FontSize="11.5" Foreground="{StaticResource MutedBrush}"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                    <Button Grid.Column="2" Style="{StaticResource IconButton}" Width="30" Height="30"
+                            Click="WifiMore_Click">
+                        <TextBlock Text="&#xE76C;" FontFamily="{StaticResource IconFont}" FontSize="11"
+                                   Foreground="{StaticResource MutedBrush}"/>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <Border x:Name="BluetoothTile" Grid.Column="2" Style="{StaticResource Tile}"
+                    MouseLeftButtonUp="Bluetooth_Click">
+                <Grid Margin="10,0,4,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Border x:Name="BluetoothDot" Width="32" Height="32" CornerRadius="16"
+                            VerticalAlignment="Center">
+                        <TextBlock Text="&#xE702;" FontFamily="{StaticResource IconFont}" FontSize="15"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Bluetooth" FontSize="13" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="BluetoothStatus" FontSize="11.5"
+                                   Foreground="{StaticResource MutedBrush}" TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                    <Button Grid.Column="2" Style="{StaticResource IconButton}" Width="30" Height="30"
+                            Click="BluetoothMore_Click">
+                        <TextBlock Text="&#xE76C;" FontFamily="{StaticResource IconFont}" FontSize="11"
+                                   Foreground="{StaticResource MutedBrush}"/>
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- One row per connected device, built in code -->
+        <StackPanel x:Name="DeviceList" Grid.Row="2" Margin="16,0,16,0"/>
+
+        <TextBlock x:Name="EmptyText" Grid.Row="2" Text="No drives, phones or Bluetooth devices connected"
+                   FontSize="12" Foreground="{StaticResource MutedBrush}"
+                   HorizontalAlignment="Center" Margin="0,4,0,0"/>
+    </Grid>
+</v:NotchPage>
