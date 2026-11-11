@@ -1,0 +1,33 @@
+<UserControl x:Class="Notch.Views.HudBanner"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:Notch.Controls"
+             Height="60">
+
+    <!-- A short status popup: ring with an icon, two lines of text, a large value. -->
+    <Grid Margin="16,0,22,0">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Width="34" Height="34" VerticalAlignment="Center">
+            <c:ProgressRing x:Name="Ring" StrokeWidth="4"/>
+            <Path x:Name="Glyph" Fill="White" Width="13" Height="14" Stretch="Uniform"
+                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <TextBlock x:Name="FontGlyph" FontFamily="{StaticResource IconFont}" FontSize="14"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Grid>
+
+        <StackPanel Grid.Column="1" Margin="14,0,12,0" VerticalAlignment="Center">
+            <TextBlock x:Name="TitleText" FontSize="14.5" FontWeight="SemiBold"
+                       TextTrimming="CharacterEllipsis"/>
+            <TextBlock x:Name="SubtitleText" FontSize="12" Foreground="{StaticResource MutedBrush}"
+                       TextTrimming="CharacterEllipsis"/>
+        </StackPanel>
+
+        <TextBlock x:Name="ValueText" Grid.Column="2" FontFamily="{StaticResource DisplayFont}"
+                   FontSize="24" VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
+    </Grid>
+</UserControl>
