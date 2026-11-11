@@ -1,0 +1,253 @@
+<Window x:Class="Notch.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="clr-namespace:Notch.Controls"
+        Title="Notch settings"
+        Width="740" Height="520"
+        ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen"
+        Background="#1C1C1E" Foreground="White"
+        FontFamily="{StaticResource TextFont}"
+        UseLayoutRounding="True">
+
+    <!-- Sidebar on the left picks which panel on the right is visible.
+         Every change is applied and saved straight away; there is no Save button. -->
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="190"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Background="#141416">
+            <StackPanel Margin="12,18,12,12">
+                <TextBlock Text="Notch" FontFamily="{StaticResource DisplayFont}" FontSize="18"
+                           FontWeight="SemiBold" Margin="12,0,0,14"/>
+                <RadioButton x:Name="NavAppearance" Style="{StaticResource SettingsNavItem}"
+                             Content="Appearance" Click="Nav_Click"/>
+                <RadioButton x:Name="NavBehaviour" Style="{StaticResource SettingsNavItem}"
+                             Content="Behaviour" Click="Nav_Click"/>
+                <RadioButton x:Name="NavFeatures" Style="{StaticResource SettingsNavItem}"
+                             Content="Features" Click="Nav_Click"/>
+                <RadioButton x:Name="NavAbout" Style="{StaticResource SettingsNavItem}"
+                             Content="About" Click="Nav_Click"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ===================== Appearance ===================== -->
+        <ScrollViewer x:Name="AppearancePanel" Grid.Column="1" Focusable="False"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="26,20,26,8">
+                <TextBlock Style="{StaticResource SettingsTitle}" Text="Appearance"/>
+
+                <TextBlock Style="{StaticResource SettingsHeader}" Text="Notch"/>
+                <Border Style="{StaticResource SettingsCard}">
+                    <StackPanel>
+                        <c:SettingRow Title="Style"
+                                      Description="Floating sits just below the top edge. Classic is joined to it.">
+                            <Border Style="{StaticResource SegmentGroup}">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton x:Name="StyleFloating" Style="{StaticResource Segment}"
+                                                 Content="Floating" Click="Style_Click"/>
+                                    <RadioButton x:Name="StyleClassic" Style="{StaticResource Segment}"
+                                                 Content="Classic" Click="Style_Click"/>
+                                </StackPanel>
+                            </Border>
+                        </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
+
+                        <c:SettingRow Title="Width" Description="How wide the closed notch is.">
+                            <StackPanel Orientation="Horizontal">
+                                <Slider x:Name="WidthSlider" Style="{StaticResource DarkSlider}" Width="170"
+                                        Minimum="130" Maximum="230" SmallChange="2" LargeChange="10"
+                                        ValueChanged="Width_ValueChanged"/>
+                                <TextBlock x:Name="WidthLabel" Width="46" TextAlignment="Right"
+                                           FontSize="12.5" Foreground="#8CFFFFFF" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
+
+                        <c:SettingRow x:Name="GapRow" Title="Gap from the top"
+                                      Description="Space above the floating notch.">
+                            <StackPanel Orientation="Horizontal">
+                                <Slider x:Name="GapSlider" Style="{StaticResource DarkSlider}" Width="170"
+                                        Minimum="0" Maximum="20" SmallChange="1" LargeChange="2"
+                                        ValueChanged="Gap_ValueChanged"/>
+                                <TextBlock x:Name="GapLabel" Width="46" TextAlignment="Right"
+                                           FontSize="12.5" Foreground="#8CFFFFFF" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </c:SettingRow>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Style="{StaticResource SettingsHeader}" Text="Colour"/>
+                <Border Style="{StaticResource SettingsCard}">
+                    <c:SettingRow Title="Accent colour"
+                                  Description="Used for the battery ring, timer and active buttons.">
+                        <StackPanel x:Name="AccentSwatches" Orientation="Horizontal"/>
+                    </c:SettingRow>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ===================== Behaviour ===================== -->
+        <ScrollViewer x:Name="BehaviourPanel" Grid.Column="1" Focusable="False"
+                      VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+            <StackPanel Margin="26,20,26,8">
+                <TextBlock Style="{StaticResource SettingsTitle}" Text="Behaviour"/>
+
+                <TextBlock Style="{StaticResource SettingsHeader}" Text="Notch"/>
+                <Border Style="{StaticResource SettingsCard}">
+                    <StackPanel>
+                        <c:SettingRow Title="Open the notch"
+                                      Description="It always closes when the mouse leaves.">
+                            <Border Style="{StaticResource SegmentGroup}">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton x:Name="OpenHover" Style="{StaticResource Segment}"
+                                                 Content="Hover" Click="Open_Click"/>
+                                    <RadioButton x:Name="OpenClick" Style="{StaticResource Segment}"
+                                                 Content="Click" Click="Open_Click"/>
+                                </StackPanel>
+                            </Border>
+                        </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
+
+                        <c:SettingRow Title="Animation speed">
+                            <Border Style="{StaticResource SegmentGroup}">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton x:Name="SpeedRelaxed" Style="{StaticResource Segment}"
+                                                 Content="Relaxed" Click="Speed_Click"/>
+                                    <RadioButton x:Name="SpeedNormal" Style="{StaticResource Segment}"
+                                                 Content="Normal" Click="Speed_Click"/>
+                                    <RadioButton x:Name="SpeedFast" Style="{StaticResource Segment}"
+                                                 Content="Fast" Click="Speed_Click"/>
+                                </StackPanel>
+                            </Border>
+                        </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
+
+                        <c:SettingRow Title="Page icons"
+                                      Description="Show page icons when you hover the page dots.">
+                            <CheckBox x:Name="PageIconsToggle" Style="{StaticResource Toggle}"
+                                      Click="Toggle_Click"/>
+                        </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
+
+                        <c:SettingRow Title="Hide in fullscreen"
+                                      Description="Get out of the way of fullscreen games and videos.">
+                            <CheckBox x:Name="FullscreenToggle" Style="{StaticResource Toggle}"
+                                      Click="Toggle_Click"/>
+                        </c:SettingRow>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Style="{StaticResource SettingsHeader}" Text="Windows"/>
+                <Border Style="{StaticResource SettingsCard}">
+                    <c:SettingRow Title="Start with Windows"
+                                  Description="Launch Notch when you sign in.">
+                        <CheckBox x:Name="StartupToggle" Style="{StaticResource Toggle}"
+                                  Click="Startup_Click"/>
+                    </c:SettingRow>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ===================== Features ===================== -->
+        <ScrollViewer x:Name="FeaturesPanel" Grid.Column="1" Focusable="False"
+                      VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+            <StackPanel Margin="26,20,26,8">
+                <TextBlock Style="{StaticResource SettingsTitle}" Text="Features"/>
+
+                <TextBlock Style="{StaticResource SettingsHeader}" Text="Pages"/>
+                <Border Style="{StaticResource SettingsCard}">
+                    <StackPanel>
+                        <c:SettingRow Title="Notifications page"
+                                      Description="A list of your Windows notifications in the open notch.">
+                            <CheckBox x:Name="NotificationsPageToggle" Style="{StaticResource Toggle}"
+                                      Click="Toggle_Click"/>
+                        </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
+                        <c:SettingRow Title="Focus timer page"
+                                      Description="A countdown that also shows in the closed notch.">
+                            <CheckBox x:Name="TimerPageToggle" Style="{StaticResource Toggle}"
+                                      Click="Toggle_Click"/>
+                        </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
+                        <c:SettingRow Title="Devices page"
+                                      Description="Wi-Fi and Bluetooth switches, and connected drives, phones and Bluetooth devices.">
+                            <CheckBox x:Name="DevicesPageToggle" Style="{StaticResource Toggle}"
+                                      Click="Toggle_Click"/>
+                        </c:SettingRow>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Style="{StaticResource SettingsHeader}" Text="Music"/>
+                <Border Style="{StaticResource SettingsCard}">
+                    <StackPanel>
+                        <c:SettingRow Title="Lyrics"
+                                      Description="Adds a lyrics button. The song title and artist are sent to lrclib.net to find them.">
+                            <CheckBox x:Name="LyricsToggle" Style="{StaticResource Toggle}" Click="Toggle_Click"/>
+                        </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
+                        <c:SettingRow Title="Album colour glow"
+                                      Description="Tint the notch with the colour of the album cover.">
+                            <CheckBox x:Name="AlbumGlowToggle" Style="{StaticResource Toggle}" Click="Toggle_Click"/>
+                        </c:SettingRow>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Style="{StaticResource SettingsHeader}" Text="Popups"/>
+                <Border Style="{StaticResource SettingsCard}">
+                    <StackPanel>
+                        <c:SettingRow Title="Notification popups"
+                                      Description="Show new notifications in the notch. Click one to enlarge it.">
+                            <CheckBox x:Name="NotificationPopupsToggle" Style="{StaticResource Toggle}"
+                                      Click="Toggle_Click"/>
+                        </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
+                        <c:SettingRow Title="Charger and battery popups"
+                                      Description="When the charger is plugged in or removed, and at low battery.">
+                            <CheckBox x:Name="PowerPopupsToggle" Style="{StaticResource Toggle}"
+                                      Click="Toggle_Click"/>
+                        </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
+                        <c:SettingRow Title="Volume popup"
+                                      Description="Show the level while you change the volume.">
+                            <CheckBox x:Name="VolumePopupsToggle" Style="{StaticResource Toggle}"
+                                      Click="Toggle_Click"/>
+                        </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
+                        <c:SettingRow Title="Device popups"
+                                      Description="When a drive, phone or Bluetooth device connects or disconnects.">
+                            <CheckBox x:Name="DevicePopupsToggle" Style="{StaticResource Toggle}"
+                                      Click="Toggle_Click"/>
+                        </c:SettingRow>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- ===================== About ===================== -->
+        <ScrollViewer x:Name="AboutPanel" Grid.Column="1" Focusable="False"
+                      VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
+            <StackPanel Margin="26,20,26,8">
+                <TextBlock Style="{StaticResource SettingsTitle}" Text="About"/>
+
+                <Border Style="{StaticResource SettingsCard}">
+                    <StackPanel>
+                        <c:SettingRow x:Name="VersionRow" Title="Notch"/>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
+                        <c:SettingRow Title="Settings file"
+                                      Description="Your choices are saved as settings.json in this folder.">
+                            <Button Style="{StaticResource SettingsButton}" Content="Open folder"
+                                    Click="OpenFolder_Click"/>
+                        </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
+                        <c:SettingRow Title="Quit" Description="Close the notch until you start it again.">
+                            <Button Style="{StaticResource SettingsButton}" Content="Quit Notch"
+                                    Click="Quit_Click"/>
+                        </c:SettingRow>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
