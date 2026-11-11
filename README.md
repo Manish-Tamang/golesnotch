@@ -1,5 +1,8 @@
 # Notch
 
+[![Build](https://github.com/Manish-Tamang/golesnotch/actions/workflows/build.yml/badge.svg)](https://github.com/Manish-Tamang/golesnotch/actions/workflows/build.yml)
+[![Latest release](https://img.shields.io/github/v/release/Manish-Tamang/golesnotch)](https://github.com/Manish-Tamang/golesnotch/releases/latest)
+
 A small, animated notch for the top of your Windows screen. Closed, it is a pill showing the clock and battery. Hover it and it springs open into music controls with synced lyrics, your notifications and a focus timer.
 
 Written in C# with WPF. It runs natively, uses no web view, and has no dependencies beyond .NET.
@@ -20,6 +23,10 @@ Written in C# with WPF. It runs natively, uses no web view, and has no dependenc
 - **Devices.** A popup when a USB drive, phone or Bluetooth device connects or disconnects; click it to open the device. The same page lists what is connected, with Open and Eject. Useful if you run without the taskbar tray.
 - **Settings window.** Style, width, gap, accent colour, hover or click to open, animation speed, and a switch for every feature.
 - **Stays on top, out of the way.** It keeps itself in front of other windows, never takes keyboard focus, doesn't appear in the taskbar or Alt+Tab, lets clicks through around the pill, and hides while a fullscreen app is in front.
+
+## Download
+
+Get the latest `Notch.exe` from [Releases](https://github.com/Manish-Tamang/golesnotch/releases/latest). The **portable** zip runs on its own; the smaller one needs the .NET 10 Desktop Runtime. Windows SmartScreen may warn you the first time because the exe isn't code-signed: click **More info → Run anyway**.
 
 ## Requirements
 
@@ -58,6 +65,17 @@ This creates `publish\Notch.exe`. It needs the [.NET 10 Desktop Runtime](https:/
 | Click a "device connected" popup | Open the drive or device |
 | Click the Wi-Fi or Bluetooth tile | Switch it on or off; the arrow opens Windows' list |
 | Right-click the notch | Settings and Quit |
+
+## Releasing
+
+Push a version tag and GitHub Actions builds both zips and publishes the release:
+
+```powershell
+git tag v0.3.0
+git push origin v0.3.0
+```
+
+Every push to `main` is also built, so compile errors show up on the Actions tab.
 
 ## Settings
 
