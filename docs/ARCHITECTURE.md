@@ -29,27 +29,38 @@ The same idea applies to content:
 - Every view and page is laid out once, at its own size, and is not resized while the island moves. Where a real layout change is needed (the music player narrows when lyrics open beside it), it happens in one step while that panel is faded out.
 - Things that move (pages sliding, the page dots following the bottom edge, lyrics scrolling) use render transforms, not layout.
 
-In classic style the rectangle starts above the top of the screen, so its top corners are cut off, and two small shoulder shapes follow its sides to curve it into the screen edge.
+The rectangle's top edge rides on a spring too, and `IslandShape.MoveTo` takes an `IslandEdge` that says where it should be. In classic style the rectangle starts above the top of the screen, so its top corners are cut off, and two small shoulder shapes follow its sides to curve it into the screen edge. The top edge shares the radius's spring settings exactly, so it stays locked to the radius and the cut-off corners never show. While asleep (`Tucked`) the top edge goes above the screen in either style and the island becomes a thin strip against the top edge. The shoulders fade in and out instead of appearing at once.
 
 The album glow is a gradient drawn over the same outline, so it follows the island for free.
 
 ## Modes
 
-The notch is always in one of three modes (`NotchWindow.Mode`):
+The notch is always in one of four modes (`NotchWindow.Mode`):
 
 | Mode | Shows | Size |
 | --- | --- | --- |
+| Sleeping | Nothing: a thin strip against the top edge | 96 × 6 |
 | Collapsed | The pill: battery ring or cover, clock, equalizer bars; or the current lyric line | Width from settings (340 with a lyric line) × 32 |
 | Hud | A short popup: a status banner, the volume bar or a notification card | 380 × the content's height |
 | Expanded | One of the pages, plus the page dots or page icons | The page's width × its height |
 
-`SetMode` does two things: `ApplyIsland` sends the island towards the new mode's size, and `ApplyViews` cross-fades the stacked views so only the right one is visible.
+`SetMode` does three things: `ApplyIsland` sends the island towards the new mode's size, `ApplyViews` cross-fades the stacked views so only the right one is visible, and between Collapsed and Expanded `StartMorph` flies the shared elements across (below). Views blur slightly as they fade out and come into focus as they fade in; the blur is removed once a view is fully in, so its text is crisp.
+
+**Sleep.** After `SleepAfterSeconds` with the pill untouched, the notch goes to Sleeping, so it covers almost nothing at the top of the screen. Pointing at the strip opens it (or wakes it to the pill when the notch opens on click). A popup that arrives while it's asleep wakes it and puts it back to sleep afterwards.
+
+**Where the pointer is.** The strip is only a few pixels tall, and in floating style there's a transparent gap between the screen edge and the island where WPF sees no mouse at all. So opening, closing and sleeping check the real pointer through `IsCursorOverIsland`, which asks Windows and counts the gap above the island as part of it. WPF also loses track of the mouse during drag and drop, which is why the drag code uses it too.
+
+**The morph.** When the notch opens on a page that shows something the pill was showing (the clock, the album cover, the timer's countdown and ring), that element flies from the pill to its place on the page, growing as it goes, and back when the notch closes. A page names its matching elements through `NotchPage.MorphTarget`, using the keys in `MorphKeys`. Two copies travel the same path on `MorphLayer`, the pill's look fading into the page's, while the real elements are hidden with an opacity mask until they land.
 
 Hovering the page dots sets a flag that adds a little height and swaps the dots for `Controls/PageTabs`, the row of page icons. The row appears where the dots were and the island grows down around it.
 
 ## Pages
 
 A page is a `UserControl` that derives from `Views/NotchPage`. It reports how big the notch should be through `PageWidth` and `PageHeight`, and can change them at any time (the music page widens when lyrics open). `IconGlyph` is its icon in the page icon row. `OnShown` and `OnHidden` tell it when to start and stop timers and animations.
+
+### The file shelf
+
+`Views/ShelfPage` holds files dragged onto the notch; `Services/ShelfService` keeps their paths (never copies) in `%APPDATA%\Notch\shelf.json`. The notch window, not the page, is the drop target: dragging files over the island opens it on the shelf, whatever mode it was in. Each file can be clicked to open it or dragged back out as an ordinary file drag, so the drop target chooses whether to copy or move it, like Explorer does. Files that were moved away drop off the shelf. While a file is being dragged out, the notch closes as soon as the pointer leaves it so the window underneath can take the drop. Thumbnails come from Explorer's own thumbnail cache through `Interop/ShellThumbnail`.
 
 ### Adding a page
 
@@ -69,12 +80,13 @@ Services live in `Services/` and know nothing about the UI. `AppServices` create
 | `LyricsSession` | `MediaService` + `LyricsService` | Whether lyrics are on, the current song's lyrics and the line being sung. Shared by the music page and the closed pill. |
 | `AlbumColor` | The cover image | Groups pixels by hue and averages the most vivid group. |
 | `NotificationService` | `UserNotificationListener` | Polls every 1.5 seconds, because the API's change event only works for packaged apps. |
-| `PowerService` | `PowerManager` | Battery level, charging and charger state. |
+| `PowerService` | `PowerManager` | Battery level, charging and charger state. Shown in the open notch by `Controls/BatteryIcon`, which turns the accent colour with a bolt while plugged in. |
 | `VolumeService` | Core Audio (`Interop/CoreAudio.cs`) | Follows the default playback device and is called back when its volume changes. |
 | `RadioService` | `Windows.Devices.Radios` | The Wi-Fi and Bluetooth on/off switches. |
 | `DeviceService` | `DeviceWatcher` | Storage devices and connected Bluetooth devices. Opens them, and ejects drives through Explorer's own Eject command. |
 | `FocusTimer` | A `DispatcherTimer` | Counts down against the clock, so it stays accurate if the UI is busy. |
 | `StartupRegistration` | The registry's Run key | Per user; no admin rights. |
+| `ShelfService` | `shelf.json` | The file shelf's paths. UI thread only. |
 
 Services may raise events on any thread. Views always switch to the UI thread with `Dispatcher.InvokeAsync` before touching controls.
 
