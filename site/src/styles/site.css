@@ -1,0 +1,559 @@
+/* The site around the demo notch.
+   Type: Inter at a 16px base, with a short scale (44 / 17 / 16 / 15 / 13).
+   Space: multiples of 4px. Every section below the hero shares two columns, a title
+   on the left and the content on the right, so text lines up down the page. */
+
+:root {
+    --ink: #111;
+    --body: #3d3d3d;
+    --mute: #6e6e6e;
+    --line: #ebebeb;
+    --soft: #f5f5f5;
+    --brand: #30d158;
+    --accent: #30d158;
+    --r: 999px;
+    --ease: cubic-bezier(0.2, 0, 0, 1);
+    --label: 152px; /* the left column */
+    --gutter: 32px;
+    color-scheme: light;
+}
+* {
+    box-sizing: border-box;
+}
+html {
+    -webkit-text-size-adjust: 100%;
+}
+body {
+    margin: 0;
+    background: #fff;
+    color: var(--ink);
+    font: 400 16px/1.6 var(--font-inter, ui-sans-serif, system-ui, sans-serif);
+    font-feature-settings:
+        "cv11",
+        "ss03"; /* Inter's single-storey a and rounder quotes */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+h1,
+h2,
+h3,
+p {
+    margin: 0;
+}
+button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+}
+a {
+    color: inherit;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+}
+:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+/* ---------- Page and header ---------- */
+.page {
+    display: flex;
+    flex-direction: column;
+    max-width: 704px;
+    min-height: 100dvh;
+    margin: 0 auto;
+    padding: 0 24px 40px;
+}
+.bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: 72px;
+}
+.logo {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 2px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    text-decoration: none;
+}
+.logo::after {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--brand);
+    transition: scale 0.3s var(--ease);
+}
+.logo:hover::after {
+    scale: 1.5;
+}
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+.navlink {
+    padding: 6px 12px;
+    border-radius: var(--r);
+    color: var(--mute);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+        color 0.15s,
+        background-color 0.15s;
+}
+.navlink:hover,
+.navlink[aria-current="page"] {
+    color: var(--ink);
+}
+.navlink:hover {
+    background: var(--soft);
+}
+.gh {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 36px;
+    margin-left: 6px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition:
+        background-color 0.15s,
+        scale 0.15s;
+}
+.gh:hover {
+    background: var(--soft);
+}
+.gh:active {
+    scale: 0.97;
+}
+
+main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr); /* long unbreakable lines (the git command) mustn't widen the page */
+    align-content: start;
+    gap: 56px;
+    padding-top: 80px;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+}
+h1 {
+    max-width: 15ch;
+    font-size: clamp(32px, 6.4vw, 46px);
+    font-weight: 650;
+    line-height: 1.06;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+}
+.tag {
+    max-width: 36em;
+    margin-top: 20px;
+    color: var(--body);
+    font-size: 17px;
+    line-height: 1.65;
+    letter-spacing: -0.011em;
+    text-wrap: pretty;
+}
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 20px;
+    margin-top: 32px;
+}
+.primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 22px 0 18px;
+    border-radius: var(--r);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    background: linear-gradient(#2c2c2c, #0d0d0d);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        inset 0 0 0 1px #000,
+        0 1px 2px rgba(0, 0, 0, 0.2),
+        0 6px 16px -8px rgba(0, 0, 0, 0.5);
+    transition:
+        scale 0.15s,
+        filter 0.15s;
+}
+.primary:hover {
+    filter: brightness(1.25);
+}
+.primary:active {
+    scale: 0.97;
+}
+.primary svg {
+    width: 17px;
+    height: 17px;
+}
+.hint {
+    color: var(--mute);
+    font-size: 14px;
+}
+.cmd {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: min(100%, 460px);
+    margin-top: 20px;
+    padding: 4px 4px 4px 18px;
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    font: 13px/1 ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
+}
+.cmd code {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font: inherit;
+}
+.copy {
+    flex: none;
+    min-width: 72px;
+    height: 32px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: var(--r);
+    background: var(--ink);
+    color: #fff;
+    font: 600 13px/1 var(--font-inter, system-ui, sans-serif);
+    transition: scale 0.15s;
+}
+.copy:active {
+    scale: 0.95;
+}
+.quiet {
+    max-width: 40em;
+    margin-top: 16px;
+    color: var(--mute);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* ---------- Sections: title on the left, content on the right ---------- */
+.group {
+    display: grid;
+    grid-template-columns: var(--label) minmax(0, 1fr);
+    column-gap: var(--gutter);
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+}
+.group > h2 {
+    grid-row: 1 / span 3;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: start;
+    gap: 6px 8px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 26px; /* matches the first line of text beside it */
+    letter-spacing: -0.015em;
+}
+.group > p {
+    grid-column: 2;
+    max-width: 34em;
+    color: var(--body);
+    font-size: 15px;
+    line-height: 26px;
+    text-wrap: pretty;
+}
+.group > .row,
+.group > .settings {
+    grid-column: 2;
+    margin-top: 16px;
+}
+.group > .settings:first-of-type {
+    margin-top: 0;
+}
+main > .group + .group {
+    margin-top: -16px; /* sections sit a little closer to each other than to the hero */
+}
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.row button {
+    height: 34px;
+    padding: 0 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: -0.006em;
+    transition:
+        background-color 0.15s,
+        border-color 0.15s,
+        scale 0.15s;
+}
+.row button:hover {
+    background: var(--soft);
+}
+.row button:active {
+    scale: 0.96;
+}
+.row button[aria-pressed="true"] {
+    border-color: var(--ink);
+}
+.new {
+    padding: 0 7px;
+    border-radius: var(--r);
+    background: #e8f8ed;
+    color: #1a7f3c;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 18px;
+    letter-spacing: 0;
+}
+
+/* Settings: labels in a column, controls lined up beside them */
+.settings {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    align-items: center;
+    gap: 12px 20px;
+}
+.field {
+    display: contents;
+}
+.lbl {
+    color: var(--mute);
+    font-size: 14px;
+}
+.field > :last-child {
+    justify-self: start;
+}
+.seg {
+    position: relative;
+    display: inline-flex;
+    padding: 3px;
+    border-radius: var(--r);
+    background: var(--soft);
+}
+.seg button {
+    position: relative;
+    z-index: 1;
+    height: 28px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: var(--r);
+    background: none;
+    color: var(--mute);
+    font-size: 13px;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+.seg button[aria-pressed="true"] {
+    color: var(--ink);
+}
+.seg .ind {
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    left: 0;
+    width: var(--w, 0);
+    translate: var(--x, 0) 0;
+    border-radius: var(--r);
+    background: #fff;
+    box-shadow:
+        0 0 0 1px var(--line),
+        0 1px 2px rgba(0, 0, 0, 0.06);
+}
+.seg.ready .ind {
+    transition:
+        translate 0.32s var(--ease),
+        width 0.32s var(--ease);
+}
+.swatches {
+    display: flex;
+    gap: 8px;
+    padding: 5px 0;
+}
+.swatch {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--c);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+    transition:
+        scale 0.15s,
+        box-shadow 0.2s;
+}
+.swatch[aria-pressed="true"] {
+    box-shadow:
+        inset 0 0 0 1px rgba(0, 0, 0, 0.12),
+        0 0 0 2px #fff,
+        0 0 0 3.5px var(--ink);
+}
+.swatch:active {
+    scale: 0.9;
+}
+
+/* ---------- Footer ---------- */
+footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    margin-top: 72px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    color: var(--mute);
+    font-size: 13px;
+}
+
+/* ---------- Changelog ---------- */
+.release {
+    display: grid;
+    justify-items: start;
+}
+.release-tag {
+    color: var(--mute);
+    font-size: 14px;
+    font-weight: 500;
+}
+.release .actions {
+    margin-top: 16px;
+}
+.release .gh {
+    height: 44px;
+    margin: 0;
+    padding: 0 18px;
+}
+.prose {
+    max-width: 38em;
+    color: var(--body);
+    font-size: 15px;
+    line-height: 1.7;
+}
+.prose h1 {
+    max-width: none;
+    color: var(--ink);
+}
+.prose h1 + p {
+    margin-top: 16px;
+    color: var(--mute);
+}
+.prose h2 {
+    margin-top: 48px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+    color: var(--ink);
+    font-size: 22px;
+    font-weight: 650;
+    line-height: 1.3;
+    letter-spacing: -0.025em;
+}
+.prose h2 + p {
+    margin-top: 8px;
+}
+.prose h3 {
+    margin: 28px 0 0;
+    color: var(--mute);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0;
+}
+.prose p {
+    margin-top: 12px;
+    text-wrap: pretty;
+}
+.prose ul {
+    margin: 12px 0 0;
+    padding-left: 20px;
+}
+.prose li {
+    padding-left: 4px;
+    text-wrap: pretty;
+}
+.prose li + li {
+    margin-top: 10px;
+}
+.prose li::marker {
+    color: var(--brand);
+}
+.prose strong {
+    color: var(--ink);
+    font-weight: 600;
+}
+.prose code {
+    padding: 1px 5px;
+    border-radius: 5px;
+    background: var(--soft);
+    font: 13px ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+
+/* ---------- Small screens: one column ---------- */
+@media (max-width: 600px) {
+    .bar {
+        padding-top: 64px;
+    }
+    main {
+        gap: 48px;
+        padding-top: 56px;
+    }
+    .group {
+        grid-template-columns: minmax(0, 1fr);
+        padding-top: 24px;
+    }
+    .group > h2 {
+        grid-row: auto;
+        margin-bottom: 4px;
+    }
+    .group > p,
+    .group > .row,
+    .group > .settings {
+        grid-column: 1;
+    }
+    .group > .settings:first-of-type {
+        margin-top: 12px;
+    }
+}
+@media (max-width: 440px) {
+    .hide-sm {
+        display: none;
+    }
+    .tag {
+        font-size: 16px;
+    }
+}
+
+/* The changelog's own title and intro are shown in the page's hero instead */
+.prose > h1:first-child,
+.prose > h1:first-child + p {
+    display: none;
+}
+.prose > h2:first-of-type {
+    margin-top: 0;
+}
+.release {
+    margin-top: 32px;
+}
