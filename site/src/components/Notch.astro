@@ -1,0 +1,201 @@
+---
+// The live demo of the notch, fixed to the top of every page. Sizes, fonts and icons
+// follow the real app (Views/*.xaml); its behaviour is in scripts/notch-demo.js, and
+// the buttons on the home page drive it.
+import "../styles/notch.css"
+
+// The app's own icon shapes, from Themes/Notch.xaml.
+const g = {
+  play: "M1,0 L13,7 L1,14 Z",
+  pause: "M0,0 H4 V14 H0 Z M9,0 H13 V14 H9 Z",
+  next: "M0,0 L8,6 L0,12 Z M8,0 L16,6 L8,12 Z",
+  prev: "M16,0 L8,6 L16,12 Z M8,0 L0,6 L8,12 Z",
+  lyrics:
+    "M2,0 H14 A2,2 0 0 1 16,2 V9 A2,2 0 0 1 14,11 H7 L3,14.5 V11 H2 A2,2 0 0 1 0,9 V2 A2,2 0 0 1 2,0 Z M4,3 H12 V4.6 H4 Z M4,6.4 H9.5 V8 H4 Z",
+  bolt: "M9,0 L1,9 H6.5 L5,16 L13,6.5 H7.5 Z",
+}
+---
+
+<div class="notch" id="notch">
+  <div class="notch-in" id="notchIn">
+    <span class="shoulder l"></span><span class="shoulder r"></span>
+    <div class="island" id="island" role="region" aria-label="Notch demo">
+      <!-- ===== Closed: battery ring and clock ===== -->
+      <div class="v pill" data-v="idle">
+        <span class="ring sm" data-morph="ring">
+          <svg viewBox="0 0 14 14" aria-hidden="true">
+            <circle class="track" cx="7" cy="7" r="6"></circle>
+            <circle class="arc" id="pRing" cx="7" cy="7" r="6" pathLength="100" stroke-dasharray="100" stroke-dashoffset="18"></circle>
+            <path class="bolt" d={g.bolt} transform="translate(4.4 3.3) scale(.4)"></path>
+          </svg>
+        </span>
+        <span class="pill-clock" id="pClock" data-morph="clock">9:41</span>
+      </div>
+
+      <!-- Closed, with music: cover, clock, equalizer -->
+      <div class="v pill" data-v="media">
+        <span class="cover sm" data-morph="art"></span>
+        <span class="pill-clock center" id="pClockMedia" data-morph="clock">9:41</span>
+        <span class="eq"><i></i><i></i><i></i><i></i></span>
+      </div>
+
+      <!-- Closed, with lyrics on: the line being sung -->
+      <div class="v pill lyric" data-v="lyric">
+        <svg class="lyric-ico" viewBox="0 0 16 16" aria-hidden="true"
+          ><path d="M6 12.2V3.4l7-1.6v8.6M6 12.2a2 2 0 1 1-4 0 2 2 0 0 1 4 0Zm7-1.8a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z"></path></svg
+        >
+        <span class="pill-line" id="pillLine"></span>
+      </div>
+
+      <!-- ===== Popups ===== -->
+      <div class="v banner" data-v="banner">
+        <span class="ring md">
+          <svg viewBox="0 0 34 34" aria-hidden="true">
+            <circle class="track" cx="17" cy="17" r="15"></circle>
+            <circle class="arc" id="bnRing" cx="17" cy="17" r="15" pathLength="100" stroke-dasharray="100" stroke-dashoffset="0"></circle>
+          </svg>
+          <span class="bn-ico" id="bnIco"></span>
+        </span>
+        <span class="bn-text"><b id="bnTitle"></b><span id="bnSub"></span></span>
+        <span class="bn-value" id="bnValue"></span>
+      </div>
+
+      <div class="v volume" data-v="volume">
+        <span class="vol-ico" id="volIco"></span>
+        <span class="vbar"><i id="volBar"></i></span>
+      </div>
+
+      <div class="v card-pop" data-v="notif">
+        <div class="card" id="ntCard"></div>
+      </div>
+
+      <!-- ===== Open: the pages ===== -->
+      <div class="v npage music" data-v="music">
+        <!-- Something is playing -->
+        <div class="media" id="mMedia">
+          <div class="player">
+            <div class="prow">
+              <span class="cover lg" id="mArt"></span>
+              <div class="phead" id="mHead">
+                <span class="pbatt"
+                  ><svg viewBox="0 0 25 12" width="22" height="11" aria-hidden="true">
+                    <rect class="b-out" x=".5" y=".5" width="21" height="11" rx="3.2"></rect>
+                    <rect class="b-nub" x="22.5" y="4" width="2" height="4" rx="1"></rect>
+                    <rect class="b-fill" x="2.5" y="2.5" width="17" height="7" rx="1.6"></rect>
+                    <path class="b-bolt" d="M12.8 1 7.6 6.9h3.5l-1 4.6 5.2-6.1h-3.5z"></path>
+                  </svg>
+                  <span class="b-num">82%</span></span
+                >
+                <span id="mDate"></span>
+                <b id="mTime" data-target="clock">9:41</b>
+              </div>
+              <span class="eq head-eq"><i></i><i></i><i></i><i></i></span>
+              <div class="titles">
+                <b id="mTitle"></b>
+                <span id="mArtist"></span>
+              </div>
+            </div>
+            <div class="prog">
+              <span id="mCur">0:00</span>
+              <span class="track" id="track"><i id="mBar"></i></span>
+              <span id="mLeft">-0:00</span>
+            </div>
+            <div class="ctrl">
+              <button class="ib side" id="lyrBtn" aria-label="Lyrics" aria-pressed="false"
+                ><svg viewBox="0 0 16 14.5" width="16" height="15"><path d={g.lyrics}></path></svg
+              ></button>
+              <span class="mid">
+                <button class="ib" id="prevBtn" aria-label="Previous"
+                  ><svg class="glyph" viewBox="-1 -1 18 14" width="17" height="12"><path d={g.prev}></path></svg
+                ></button>
+                <button class="ib" id="playBtn" aria-label="Play"
+                  ><svg class="glyph" id="playIco" viewBox="-1 -1 15 16" width="13" height="15"><path d={g.play}></path></svg
+                ></button>
+                <button class="ib" id="nextBtn" aria-label="Next"
+                  ><svg class="glyph" viewBox="-1 -1 18 14" width="17" height="12"><path d={g.next}></path></svg
+                ></button>
+              </span>
+              <button class="ib side" id="muteBtn" aria-label="Mute"></button>
+            </div>
+          </div>
+          <div class="lyrics-side">
+            <div class="lyrics"><div class="lines" id="lines"></div></div>
+          </div>
+        </div>
+
+        <!-- Nothing is playing: a large clock -->
+        <div class="idle-clock" id="mIdle">
+          <b id="iTime" data-target="clock">9:41</b>
+          <span class="idle-sub"
+            ><span id="iDate"></span>
+            <span class="pbatt"
+              ><svg viewBox="0 0 25 12" width="22" height="11" aria-hidden="true">
+                <rect class="b-out" x=".5" y=".5" width="21" height="11" rx="3.2"></rect>
+                <rect class="b-nub" x="22.5" y="4" width="2" height="4" rx="1"></rect>
+                <rect class="b-fill" x="2.5" y="2.5" width="17" height="7" rx="1.6"></rect>
+                <path class="b-bolt" d="M12.8 1 7.6 6.9h3.5l-1 4.6 5.2-6.1h-3.5z"></path>
+              </svg>
+              <span id="iBatt">82%</span></span
+            ></span
+          >
+        </div>
+      </div>
+
+      <div class="v npage shelf" data-v="shelf">
+        <div class="head">
+          <span><b>Shelf</b><span class="count" id="shCount"></span></span>
+          <button class="text-btn" id="shClear">Clear</button>
+        </div>
+        <div class="sh-row" id="shRow"></div>
+        <div class="drop" id="shDrop">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 4v11m-5-5 5 5 5-5M5 20h14"></path></svg>
+          <b id="shDropTitle">Drop files here</b>
+          <span>Drag out anytime · click to open</span>
+        </div>
+      </div>
+
+      <div class="v npage" data-v="notifications">
+        <div class="head">
+          <b id="nHead">Notifications</b>
+          <button class="text-btn" id="clearBtn">Clear all</button>
+        </div>
+        <div id="nlist"></div>
+      </div>
+
+      <div class="v npage timer" data-v="timer">
+        <span class="ring lg" data-target="ring">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <circle class="track" cx="50" cy="50" r="47"></circle>
+            <circle class="arc" id="tRing" cx="50" cy="50" r="47" pathLength="100" stroke-dasharray="100" stroke-dashoffset="0"></circle>
+          </svg>
+          <b id="tLeft" data-target="countdown">25:00</b>
+        </span>
+        <div class="tside">
+          <b id="tState">Focus timer</b>
+          <div class="chips" id="presets"></div>
+          <div class="btns">
+            <button class="pill-btn" id="tGo">Start</button>
+            <button class="pill-btn alt" id="tReset">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="v npage" data-v="devices">
+        <div class="head"><b>Connections</b></div>
+        <div class="tiles">
+          <button class="tile" id="wifiTile"></button>
+          <button class="tile" id="btTile"></button>
+        </div>
+        <div id="drow"></div>
+      </div>
+
+      <!-- Page dots, and the icons that replace them when the pointer rests on them -->
+      <div class="dots" id="dots"></div>
+      <div class="tabs" id="tabs"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import "../scripts/notch-demo.js"
+</script>
