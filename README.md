@@ -3,21 +3,23 @@
 [![Build](https://github.com/Manish-Tamang/golesnotch/actions/workflows/build.yml/badge.svg)](https://github.com/Manish-Tamang/golesnotch/actions/workflows/build.yml)
 [![Latest release](https://img.shields.io/github/v/release/Manish-Tamang/golesnotch)](https://github.com/Manish-Tamang/golesnotch/releases/latest)
 
-A small, animated notch for the top of your Windows screen. Closed, it is a pill showing the clock and battery. Hover it and it springs open into music controls with synced lyrics, your notifications and a focus timer.
+A small, animated notch for the top of your Windows screen. Closed, it is a pill showing the clock and battery. Hover it and it springs open into music controls with synced lyrics, a shelf for files, your notifications and a focus timer. When you're not using it, it tucks itself into a thin strip against the top edge.
 
 Written in C# with WPF. It runs natively, uses no web view, and has no dependencies beyond .NET.
 
 ## Features
 
 - **Floating or classic style.** Floating sits a few pixels below the top edge as a rounded pill. Classic is joined to the edge, with shoulders that curve out into it.
-- **Spring motion.** The notch moves on a physical spring, so opening and closing it in quick succession stays smooth.
+- **Spring motion.** The notch moves on a physical spring, so opening and closing it in quick succession stays smooth. The clock, cover and timer fly from the pill into the open page and back.
+- **Sleep.** After a few seconds untouched it shrinks into a thin strip against the top edge, so it doesn't cover what's behind it. Point at the strip to open it again.
+- **File shelf.** Drag files onto the notch to keep them close, then drag them out into a chat, an email or another folder. Click one to open it.
 - **Now playing.** Cover, title, artist, a progress bar you can click to seek, and play/pause/skip. Works with Spotify, browsers and most other players.
 - **Lyrics.** Click the lyrics button and the notch widens to show the lyrics beside the player, scrolling in time with the song. Close the notch and the line being sung stays in the pill.
 - **Album colour.** The notch takes on a soft glow in the colour of the album cover.
 - **Page icons.** Hover the page dots and they become a row of page icons with a settings button.
 - **Notifications.** New Windows notifications pop up in the notch. Click one to enlarge it and read the whole message, then open the app or dismiss it. A page lists the recent ones.
 - **Focus timer.** A countdown with 15, 25, 45 and 60 minute presets. The time left shows in the closed notch.
-- **Charger and battery popups.** A short popup when the charger is plugged in or removed, and at 20% battery.
+- **Charger and battery.** A short popup when the charger is plugged in or removed, and at 20% battery. The open notch shows the battery and percentage, with a bolt while charging.
 - **Volume popup.** Change the volume and the notch shows the level on a bar. The music page has a mute button.
 - **Wi-Fi and Bluetooth.** Switch either on or off from the notch, and open Windows' list of networks or Bluetooth devices.
 - **Devices.** A popup when a USB drive, phone or Bluetooth device connects or disconnects; click it to open the device. The same page lists what is connected, with Open and Eject. Useful if you run without the taskbar tray.
@@ -56,6 +58,9 @@ This creates `publish\Notch.exe`. It needs the [.NET 10 Desktop Runtime](https:/
 | Action | What happens |
 | --- | --- |
 | Hover the notch (or click, if set) | It opens |
+| Point at the strip at the top | A sleeping notch opens again |
+| Drag files onto the notch | They go on the shelf |
+| Drag a file off the shelf | Drop it anywhere: a chat, an email, a folder |
 | Move the mouse away | It closes |
 | Swipe two fingers sideways on the touchpad | Switch between pages |
 | Scroll the mouse wheel, or click a dot | Switch between pages |
@@ -90,8 +95,10 @@ Right-click the notch and choose **Settings**, or hover the page dots and click 
 | Open the notch | Hover | Hover or Click |
 | Animation speed | Normal | Relaxed, Normal or Fast |
 | Page icons | On | Hovering the page dots shows page icons |
+| Sleep when idle | 10 s | Off, 5, 10 or 30 seconds |
 | Hide in fullscreen | On | Hides while a fullscreen app is focused |
 | Start with Windows | Off | Adds the running exe to your sign-in apps |
+| File shelf | On | |
 | Notifications page | On | |
 | Focus timer page | On | |
 | Devices page | On | Wi-Fi and Bluetooth switches, and connected devices |
@@ -102,12 +109,13 @@ Right-click the notch and choose **Settings**, or hover the page dots and click 
 | Device popups | On | |
 | Volume popup | On | |
 
-Settings are stored in `%APPDATA%\Notch\settings.json`.
+Settings are stored in `%APPDATA%\Notch\settings.json`, and the shelf's list of files in `shelf.json` beside it.
 
 ## Privacy
 
 - **Lyrics** come from [LRCLIB](https://lrclib.net), a free and open lyrics database. When you open lyrics, the song's title and artist are sent to it. Nothing else is sent, and nothing is sent if you turn Lyrics off.
 - **Notifications** are read from Windows on your PC and shown. They are not stored or sent anywhere. Windows asks for your permission the first time; you can change it later in Windows Settings under Privacy & security, Notifications.
+- **The shelf** keeps only the paths of the files you drop on it, on your PC. Files are never copied or uploaded.
 - There is no telemetry and no account.
 
 ## Known limits
@@ -120,6 +128,8 @@ Settings are stored in `%APPDATA%\Notch\settings.json`.
 - The notch hides for fullscreen apps, not for task switchers or launchers. If it hides for a tool it shouldn't, add that tool's process name to `ShellProcesses` in `Interop/Native.cs`, or turn off **Hide in fullscreen**.
 - Windows draws a few of its own screens (Alt+Tab, Start, Task View, the lock screen) in a layer above every app, so the notch can be covered while those are open. It is back as soon as they close.
 - The Devices page lists storage and Bluetooth devices. Other USB devices, such as mice and keyboards, aren't listed.
+- The shelf takes files. Text or images dragged from a web page that aren't files are ignored.
+- Dragging a file from the shelf into a folder on the same drive moves it, as it does in Explorer; it then leaves the shelf.
 
 ## Project layout
 
@@ -132,7 +142,10 @@ Views/               The notch window, its pages and popups, the settings window
 Themes/              Shared XAML styles and icons
 Interop/             Win32 and WinRT helpers
 docs/                Architecture notes
+site/                The website (Astro), with a live demo of the notch
 ```
+
+See [CHANGELOG.md](CHANGELOG.md) for what changed in each version.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the pieces fit together and how to add a page.
 
@@ -141,7 +154,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the pieces fit together
 - Frosted glass background
 - Tray icon
 - Choice of monitor
-- To-do list and a shelf for files
+- To-do list
 
 ## License
 
