@@ -50,9 +50,11 @@ public partial class SettingsWindow : Window
         SpeedNormal.IsChecked = s.Speed == AnimationSpeed.Normal;
         SpeedFast.IsChecked = s.Speed == AnimationSpeed.Fast;
         FullscreenToggle.IsChecked = s.HideInFullscreen;
+        SelectSleepChoice(s.SleepAfterSeconds);
         PageIconsToggle.IsChecked = s.PageIcons;
         StartupToggle.IsChecked = StartupRegistration.IsEnabled;
 
+        ShelfPageToggle.IsChecked = s.ShowShelfPage;
         NotificationsPageToggle.IsChecked = s.ShowNotificationsPage;
         TimerPageToggle.IsChecked = s.ShowTimerPage;
         DevicesPageToggle.IsChecked = s.ShowDevicesPage;
@@ -136,6 +138,20 @@ public partial class SettingsWindow : Window
             : SpeedFast.IsChecked == true ? AnimationSpeed.Fast
             : AnimationSpeed.Normal);
 
+    void Sleep_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: string tag } && int.TryParse(tag, out int seconds))
+            _store.Update(s => s.SleepAfterSeconds = seconds);
+    }
+
+    /// <summary>Ticks the sleep choice nearest to the saved value (it may have been edited by hand).</summary>
+    void SelectSleepChoice(int seconds)
+    {
+        var choices = SleepChoices.Children.OfType<RadioButton>().ToList();
+        var nearest = choices.MinBy(choice => Math.Abs(int.Parse((string)choice.Tag) - seconds));
+        foreach (var choice in choices) choice.IsChecked = choice == nearest;
+    }
+
     void Startup_Click(object sender, RoutedEventArgs e)
     {
         StartupRegistration.Set(StartupToggle.IsChecked == true);
@@ -151,6 +167,7 @@ public partial class SettingsWindow : Window
         {
             s.HideInFullscreen = FullscreenToggle.IsChecked == true;
             s.PageIcons = PageIconsToggle.IsChecked == true;
+            s.ShowShelfPage = ShelfPageToggle.IsChecked == true;
             s.ShowNotificationsPage = NotificationsPageToggle.IsChecked == true;
             s.ShowTimerPage = TimerPageToggle.IsChecked == true;
             s.ShowDevicesPage = DevicesPageToggle.IsChecked == true;
