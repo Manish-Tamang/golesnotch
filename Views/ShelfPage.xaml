@@ -1,0 +1,58 @@
+<v:NotchPage x:Class="Notch.Views.ShelfPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:v="clr-namespace:Notch.Views">
+    <Grid VerticalAlignment="Top">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="42"/>    <!-- title, Drag all, Clear -->
+            <RowDefinition Height="94"/>    <!-- the files -->
+        </Grid.RowDefinitions>
+
+        <Grid Margin="20,12,14,0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Shelf" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                <TextBlock x:Name="CountText" FontSize="12" Margin="8,0,0,0" VerticalAlignment="Center"
+                           Foreground="{StaticResource MutedBrush}"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <!-- Not a button: a button would hold on to the mouse and get in the way of dragging -->
+                <Border x:Name="DragAllHandle" Background="Transparent" Padding="6,3" Cursor="Hand">
+                    <TextBlock x:Name="DragAllText" Text="Drag all" FontSize="12"
+                               Foreground="{StaticResource MutedBrush}"/>
+                </Border>
+                <Button x:Name="ClearButton" Style="{StaticResource TextButton}" Content="Clear"
+                        Click="Clear_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- The files, in a row that scrolls sideways with the mouse wheel once it overflows.
+             The Canvas lets the row be wider than the page without being cut off by layout;
+             the Border clips it instead, so it can slide. -->
+        <Border x:Name="RowViewport" Grid.Row="1" Margin="14,0,14,10" ClipToBounds="True"
+                Background="Transparent" PreviewMouseWheel="Row_PreviewMouseWheel">
+            <Canvas>
+                <StackPanel x:Name="ItemRow" Orientation="Horizontal"/>
+            </Canvas>
+        </Border>
+
+        <!-- Shown while the shelf is empty, and over the files while something is dragged onto the notch -->
+        <Grid x:Name="DropZone" Grid.Row="1" Margin="16,0,16,12" IsHitTestVisible="False">
+            <Rectangle x:Name="DropOutline" RadiusX="14" RadiusY="14" Fill="Black"
+                       StrokeThickness="1.5" StrokeDashArray="4 3" Stroke="#40FFFFFF"/>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock x:Name="DropIcon" Text="&#xE896;" FontFamily="{StaticResource IconFont}" FontSize="18"
+                           HorizontalAlignment="Center" Foreground="{StaticResource MutedBrush}"
+                           RenderTransformOrigin="0.5,0.5">
+                    <TextBlock.RenderTransform>
+                        <TranslateTransform x:Name="DropIconShift"/>
+                    </TextBlock.RenderTransform>
+                </TextBlock>
+                <TextBlock x:Name="DropTitle" Text="Drop files here" FontSize="13" FontWeight="SemiBold"
+                           HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                <TextBlock Text="Drag out anytime · click to open" FontSize="11.5" Margin="0,2,0,0"
+                           HorizontalAlignment="Center" Foreground="{StaticResource MutedBrush}"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</v:NotchPage>
