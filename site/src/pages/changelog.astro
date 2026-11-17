@@ -1,0 +1,37 @@
+---
+import Base from "../layouts/Base.astro"
+import { Content } from "../../../CHANGELOG.md"
+import { version, downloads } from "../data/release"
+---
+
+<Base
+  title="Changelog · Notch for Windows"
+  description="What's new in each version of Notch, the animated notch for Windows."
+>
+  <section class="hero">
+    <h1>Changelog</h1>
+    <p class="tag">What changed in each version of Notch. Downloads for every version are on GitHub.</p>
+    <div class="release" data-keep>
+      <span class="release-tag">Latest · v{version}</span>
+      <div class="actions">
+        <a class="primary" href={downloads.portable}
+          ><svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"><path d="M12 4v11m-5-5 5 5 5-5M5 20h14"></path></svg
+          >Portable zip</a
+        >
+        <a class="gh" href={downloads.runtime}>Smaller, needs .NET 10</a>
+        <a class="navlink" href={downloads.all}>All releases</a>
+      </div>
+    </div>
+  </section>
+
+  <article class="prose">
+    <Content />
+  </article>
+</Base>
