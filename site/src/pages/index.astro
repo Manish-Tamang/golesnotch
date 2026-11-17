@@ -1,0 +1,111 @@
+---
+import Base from "../layouts/Base.astro"
+import { version, repo, downloads } from "../data/release"
+---
+
+<Base>
+  <section class="hero">
+    <h1>A notch for Windows, on a real spring.</h1>
+    <p class="tag">
+      Closed, it's a pill with the time and battery. Hover it and it opens into music with synced lyrics, a shelf for
+      your files, notifications and a focus timer. Leave it alone and it tucks away into a thin strip.
+    </p>
+    <div class="actions">
+      <a class="primary" href={downloads.latest}
+        ><svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"><path d="M12 4v11m-5-5 5 5 5-5M5 20h14"></path></svg
+        >Download for Windows</a
+      >
+      <span class="hint" id="hint">↑ Hover the notch at the top</span>
+    </div>
+    <div class="cmd">
+      <code id="cmd">git clone {repo}</code><button class="copy" id="copyBtn" data-keep>Copy</button>
+    </div>
+    <p class="quiet">
+      Version {version} · <a href="/changelog">What's new</a> · Free and MIT licensed. Windows 10 (2004) or 11, portable
+      exe, no installer. It isn't code-signed yet, so SmartScreen may ask once.
+    </p>
+  </section>
+
+  <section class="group" data-keep aria-label="Try the settings">
+    <h2>Settings</h2>
+    <div class="settings">
+      <div class="field"><span class="lbl">Style</span><span id="segStyle"></span></div>
+      <div class="field"><span class="lbl">Accent</span><span class="swatches" id="swatches"></span></div>
+      <div class="field"><span class="lbl">Open on</span><span id="segOpen"></span></div>
+      <div class="field"><span class="lbl">Speed</span><span id="segSpeed"></span></div>
+      <div class="field"><span class="lbl">Sleep</span><span id="segSleep"></span></div>
+    </div>
+  </section>
+
+  <section class="group" data-keep>
+    <h2>Now playing</h2>
+    <p>
+      Works with Spotify, browsers and most players. Open the notch and the clock and cover fly into place. Turn on
+      lyrics and the closed pill keeps the line being sung.
+    </p>
+    <div class="row">
+      <button id="dPlay">Play</button>
+      <button id="dNext">Next song</button>
+      <button id="dLyrics" aria-pressed="false">Lyrics</button>
+      <button data-page="music">Open player</button>
+    </div>
+  </section>
+
+  <section class="group" data-keep>
+    <h2>File shelf <span class="new">New</span></h2>
+    <p>
+      Drag a file from your computer onto the notch to keep it close, then drag it out into a chat, an email or
+      another folder. Nothing is uploaded; it stays in this tab.
+    </p>
+    <div class="row">
+      <button id="dShelf">Open shelf</button>
+      <button id="dSamples">Add sample files</button>
+    </div>
+  </section>
+
+  <section class="group" data-keep>
+    <h2>Sleep <span class="new">New</span></h2>
+    <p>
+      Left alone, the notch tucks into a thin strip against the top edge, so it doesn't cover what's behind it. Point
+      at the strip and it opens again.
+    </p>
+    <div class="row">
+      <button id="dSleep">Sleep now</button>
+    </div>
+  </section>
+
+  <section class="group" data-keep>
+    <h2>Popups</h2>
+    <p>
+      Short morphs that close by themselves; hover one to open it. Plug in the charger and the open notch keeps a bolt
+      on the battery.
+    </p>
+    <div class="row">
+      <button data-hud="notif">Notification</button>
+      <button data-hud="charger">Charger</button>
+      <button data-hud="battery">Low battery</button>
+      <button data-hud="volume">Volume</button>
+      <button data-hud="usb">USB drive</button>
+      <button data-hud="focus">Focus done</button>
+    </div>
+  </section>
+
+  <section class="group" data-keep>
+    <h2>Pages</h2>
+    <p>Scroll or swipe sideways on the open notch to switch. Rest on the dots to see the page icons.</p>
+    <div class="row">
+      <button data-page="music">Music</button>
+      <button data-page="shelf">Shelf</button>
+      <button data-page="notifications">Notifications</button>
+      <button data-page="timer">Focus timer</button>
+      <button data-page="devices">Connections</button>
+    </div>
+  </section>
+</Base>
