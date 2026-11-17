@@ -61,4 +61,12 @@ public partial class TimerPage : NotchPage
     }
 
     void Reset_Click(object sender, RoutedEventArgs e) => _timer.Reset();
+
+    /// <summary>The closed notch's countdown and ring grow into this page's.</summary>
+    public override FrameworkElement? MorphTarget(string key) => key switch
+    {
+        MorphKeys.Countdown => TimeText,
+        MorphKeys.CountdownRing => Ring,
+        _ => null,
+    };
 }
