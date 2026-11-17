@@ -4,9 +4,20 @@ using Notch.Core;
 
 namespace Notch.Controls;
 
+/// <summary>How the island meets the top of the screen.</summary>
+public enum IslandEdge
+{
+    /// <summary>Hangs below the top edge, rounded on all four corners.</summary>
+    Floating,
+    /// <summary>Joined to the top edge, with curved shoulders.</summary>
+    Classic,
+    /// <summary>Asleep: a thin strip pulled up against the top edge, whatever the style.</summary>
+    Tucked,
+}
+
 /// <summary>
 /// The black body of the notch: a rounded rectangle, centred at the top, whose width,
-/// height and corner radius each ride on a <see cref="Spring"/>.
+/// top and bottom edges and corner radius each ride on a <see cref="Spring"/>.
 /// </summary>
 /// <remarks>
 /// Only the geometry changes from frame to frame, which touches the renderer and nothing
@@ -28,8 +39,10 @@ public sealed class IslandShape : FrameworkElement
     const byte GlowAlpha = 0xB4;
 
     readonly Spring _width = new(0);
-    readonly Spring _height = new(0);
+    readonly Spring _height = new(0);   // the bottom edge, measured from the island's top
+    readonly Spring _top = new(0);      // the top edge; above zero when joined to the screen edge
     readonly Spring _radius = new(0);
+    double _targetArea;
 
     readonly TranslateTransform _leftShoulderShift = new();
     readonly TranslateTransform _rightShoulderShift = new();
@@ -38,6 +51,9 @@ public sealed class IslandShape : FrameworkElement
     readonly GradientStop _glowBottom = new(Colors.Transparent, 1);
     readonly LinearGradientBrush _glow;
     Color? _glowColor;
+
+    // Shoulders fade rather than pop when the island joins or leaves the top edge.
+    readonly SolidColorBrush _shoulderBrush = new(Colors.Black) { Opacity = 0 };
 
     bool _classic;
     bool _running;
@@ -67,30 +83,51 @@ public sealed class IslandShape : FrameworkElement
     public event Action? Moved;
 
     /// <summary>Sends the island towards a new size.</summary>
-    public void MoveTo(double width, double height, double radius, bool classic, bool animate)
+    /// <param name="height">Visible height, from the island's top (or the screen's top when tucked).</param>
+    /// <param name="gap">How far the island's own top sits below the screen's top edge.</param>
+    public void MoveTo(double width, double height, double radius, IslandEdge edge, double gap, bool animate)
     {
+        bool classic = edge == IslandEdge.Classic;
         if (classic != _classic)
         {
             _classic = classic;
-            InvalidateVisual(); // the shoulders appear or disappear
+            if (animate)
+                Motion.To(_shoulderBrush, Brush.OpacityProperty, classic ? 1 : 0, classic ? 260 : 120);
+            else
+                Motion.Set(_shoulderBrush, Brush.OpacityProperty, classic ? 1 : 0);
         }
+
+        // Joined to the screen edge, the rectangle starts above it so its top corners are cut off.
+        double top = edge switch
+        {
+            IslandEdge.Classic => -(radius + ClassicOverhang),
+            IslandEdge.Tucked => -(gap + radius + ClassicOverhang),
+            _ => 0,
+        };
+        double bottom = edge == IslandEdge.Tucked ? height - gap : height;
 
         if (!animate)
         {
             _width.Snap(width);
-            _height.Snap(height);
+            _height.Snap(bottom);
+            _top.Snap(top);
             _radius.Snap(radius);
+            _targetArea = width * height;
             Apply();
             return;
         }
 
         // Growing gets a soft overshoot; shrinking settles without one.
-        bool growing = width * height >= _width.Target * _height.Target;
+        bool growing = width * height >= _targetArea;
+        _targetArea = width * height;
         double response = (growing ? 0.5 : 0.42) * Motion.SpeedFactor;
         double damping = growing ? 0.78 : 0.95;
 
         _width.To(width, response, damping);
-        _height.To(height, response, damping);
+        _height.To(bottom, response, damping);
+        // The top shares the radius's spring exactly, so in classic style it stays
+        // locked to the radius and the cut-off corners never peek below the screen edge.
+        _top.To(top, response, 1);
         _radius.To(radius, response, 1);
 
         if (!_running)
@@ -140,16 +177,14 @@ public sealed class IslandShape : FrameworkElement
     {
         drawingContext.DrawGeometry(Brushes.Black, null, Outline);
 
-        if (_classic)
-        {
-            drawingContext.PushTransform(_leftShoulderShift);
-            drawingContext.DrawGeometry(Brushes.Black, null, LeftShoulder);
-            drawingContext.Pop();
+        // Always drawn; the brush's opacity shows or hides them.
+        drawingContext.PushTransform(_leftShoulderShift);
+        drawingContext.DrawGeometry(_shoulderBrush, null, LeftShoulder);
+        drawingContext.Pop();
 
-            drawingContext.PushTransform(_rightShoulderShift);
-            drawingContext.DrawGeometry(Brushes.Black, null, RightShoulder);
-            drawingContext.Pop();
-        }
+        drawingContext.PushTransform(_rightShoulderShift);
+        drawingContext.DrawGeometry(_shoulderBrush, null, RightShoulder);
+        drawingContext.Pop();
 
         drawingContext.DrawGeometry(_glow, null, Outline);
     }
@@ -164,10 +199,11 @@ public sealed class IslandShape : FrameworkElement
         seconds = Math.Min(seconds, 0.05); // don't leap after a stall
         _width.Step(seconds);
         _height.Step(seconds);
+        _top.Step(seconds);
         _radius.Step(seconds);
         Apply();
 
-        if (_width.IsAtRest && _height.IsAtRest && _radius.IsAtRest)
+        if (_width.IsAtRest && _height.IsAtRest && _top.IsAtRest && _radius.IsAtRest)
         {
             CompositionTarget.Rendering -= OnFrame;
             _running = false;
@@ -178,13 +214,12 @@ public sealed class IslandShape : FrameworkElement
     void Apply()
     {
         double width = Math.Max(0, _width.Value);
-        double height = Math.Max(0, _height.Value);
         double radius = Math.Max(0, _radius.Value);
-
-        double top = _classic ? -(radius + ClassicOverhang) : 0;
+        double top = _top.Value;
+        double bottom = Math.Max(top, _height.Value);
         double left = (ActualWidth - width) / 2;
 
-        Outline.Rect = new Rect(left, top, width, height - top);
+        Outline.Rect = new Rect(left, top, width, bottom - top);
         Outline.RadiusX = radius;
         Outline.RadiusY = radius;
 
