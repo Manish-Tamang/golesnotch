@@ -23,6 +23,7 @@ public sealed class AppServices
     public VolumeService Volume { get; } = new();
     public RadioService Radios { get; } = new();
     public FocusTimer Timer { get; } = new();
+    public ShelfService Shelf { get; } = new();
 
     /// <summary>Starts the services that watch Windows. Call from the UI thread.</summary>
     public async Task StartAsync()
