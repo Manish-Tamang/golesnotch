@@ -19,6 +19,10 @@ public sealed class ProgressRing : FrameworkElement
         nameof(StrokeWidth), typeof(double), typeof(ProgressRing),
         new FrameworkPropertyMetadata(2.0, FrameworkPropertyMetadataOptions.AffectsRender));
 
+    public static readonly DependencyProperty GlyphProperty = DependencyProperty.Register(
+        nameof(Glyph), typeof(Geometry), typeof(ProgressRing),
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+
     static readonly Brush Track = CreateTrack();
 
     public ProgressRing()
@@ -46,6 +50,13 @@ public sealed class ProgressRing : FrameworkElement
         set => SetValue(StrokeWidthProperty, value);
     }
 
+    /// <summary>A small icon drawn inside the ring, such as a bolt while charging. Null for none.</summary>
+    public Geometry? Glyph
+    {
+        get => (Geometry?)GetValue(GlyphProperty);
+        set => SetValue(GlyphProperty, value);
+    }
+
     /// <summary>Red when true; otherwise the ring follows the accent colour.</summary>
     public void SetWarning(bool warning)
     {
@@ -63,6 +74,19 @@ public sealed class ProgressRing : FrameworkElement
 
         var centre = new Point(ActualWidth / 2, ActualHeight / 2);
         drawingContext.DrawEllipse(null, new Pen(Track, width), centre, radius, radius);
+
+        if (Glyph is { } glyph && !glyph.Bounds.IsEmpty)
+        {
+            // Fit the icon inside the ring's hole, centred.
+            var bounds = glyph.Bounds;
+            double room = (radius - width / 2) * 1.55;
+            double scale = room / Math.Max(bounds.Width, bounds.Height);
+            double x = centre.X - (bounds.X + bounds.Width / 2) * scale;
+            double y = centre.Y - (bounds.Y + bounds.Height / 2) * scale;
+            drawingContext.PushTransform(new MatrixTransform(scale, 0, 0, scale, x, y));
+            drawingContext.DrawGeometry(Stroke, null, glyph);
+            drawingContext.Pop();
+        }
 
         double value = double.IsNaN(Value) ? 0 : Math.Clamp(Value, 0, 1);
         if (value <= 0.001) return;
