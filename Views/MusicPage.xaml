@@ -35,8 +35,12 @@
                 <!-- Centred on the notch, above the title. Hidden while lyrics are beside the player. -->
                 <Grid x:Name="Header" VerticalAlignment="Top">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <c:ProgressRing x:Name="BatteryRing" Width="13" Height="13" Margin="0,0,7,0"
-                                        VerticalAlignment="Center"/>
+                        <!-- Battery: the fill turns the accent colour and shows a bolt while charging -->
+                        <StackPanel x:Name="BatteryGroup" Orientation="Horizontal" Margin="0,0,10,0">
+                            <c:BatteryIcon x:Name="BatteryGauge" Width="22" Height="11" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="BatteryText" FontSize="12" Margin="5,0,0,0" VerticalAlignment="Center"
+                                       Foreground="{StaticResource MutedBrush}" Typography.NumeralAlignment="Tabular"/>
+                        </StackPanel>
                         <TextBlock x:Name="DateText" FontSize="12.5" VerticalAlignment="Center"/>
                         <TextBlock x:Name="TimeText" FontSize="12.5" FontWeight="SemiBold" Margin="6,0,0,0"
                                    VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
@@ -112,12 +116,14 @@
                        FontWeight="Light" HorizontalAlignment="Center" Margin="0,12,0,0"
                        Typography.NumeralAlignment="Tabular"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,2,0,0">
-                <c:ProgressRing x:Name="IdleRing" Width="12" Height="12" Margin="0,0,7,0"
-                                VerticalAlignment="Center"/>
                 <TextBlock x:Name="IdleDate" FontSize="12.5" Foreground="{StaticResource MutedBrush}"
                            VerticalAlignment="Center"/>
-                <TextBlock x:Name="IdleBattery" FontSize="12.5" Foreground="{StaticResource MutedBrush}"
-                           VerticalAlignment="Center"/>
+                <StackPanel x:Name="IdleBatteryGroup" Orientation="Horizontal" Margin="12,0,0,0">
+                    <c:BatteryIcon x:Name="IdleGauge" Width="22" Height="11" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="IdleBattery" FontSize="12.5" Margin="6,0,0,0"
+                               Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center"
+                               Typography.NumeralAlignment="Tabular"/>
+                </StackPanel>
             </StackPanel>
         </StackPanel>
     </Grid>
