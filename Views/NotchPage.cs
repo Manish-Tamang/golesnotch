@@ -57,4 +57,20 @@ public class NotchPage : UserControl
 
     /// <summary>The notch closed, or the user switched away. Stop timers and animations here.</summary>
     public virtual void OnHidden() { }
+
+    /// <summary>
+    /// The element on this page that shows the same thing as the closed pill's
+    /// <paramref name="key"/> element (see <see cref="MorphKeys"/>), or null. When the notch
+    /// opens on this page, a copy of it flies from the pill to here, and back on closing.
+    /// </summary>
+    public virtual FrameworkElement? MorphTarget(string key) => null;
+}
+
+/// <summary>Names for the closed pill's elements that can morph into a page's.</summary>
+public static class MorphKeys
+{
+    public const string Clock = "clock";
+    public const string Art = "art";
+    public const string Countdown = "countdown";
+    public const string CountdownRing = "countdown-ring";
 }
