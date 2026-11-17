@@ -1,0 +1,1143 @@
+/* The demo notch. Sizes, spacing and type follow the real app (Views/*.xaml), so the
+   demo looks like the thing you download. Segoe UI Variable is what the app uses; on
+   machines without it, Inter stands in. */
+
+.notch {
+    --mute: rgba(255, 255, 255, 0.55);
+    --soft-w: rgba(255, 255, 255, 0.1);
+    --text: "Segoe UI Variable Text", "Segoe UI", var(--font-inter, system-ui), sans-serif;
+    --display: "Segoe UI Variable Display", "Segoe UI", var(--font-inter, system-ui), sans-serif;
+    --spring: cubic-bezier(0.34, 1.32, 0.64, 1);
+    --settle: cubic-bezier(0.2, 0, 0, 1);
+
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+}
+.notch-in {
+    position: relative;
+    margin-top: 8px; /* the floating style's gap below the screen edge */
+    pointer-events: auto;
+    transform-origin: 50% 0;
+    transition: margin-top 0.45s var(--settle);
+}
+.notch.classic .notch-in,
+.notch.tucked .notch-in {
+    margin-top: 0;
+}
+
+/* Classic style: 9px concave shoulders curve the island into the top edge */
+.shoulder {
+    position: absolute;
+    top: 0;
+    width: 9px;
+    height: 9px;
+    opacity: 0;
+    transition: opacity 0.26s;
+}
+.notch.classic:not(.tucked) .shoulder {
+    opacity: 1;
+}
+.shoulder.l {
+    right: 100%;
+    background: radial-gradient(circle at 0 100%, transparent 8.5px, #000 9px);
+}
+.shoulder.r {
+    left: 100%;
+    background: radial-gradient(circle at 100% 100%, transparent 8.5px, #000 9px);
+}
+
+/* ---------- The island ---------- */
+.island {
+    position: relative;
+    isolation: isolate;
+    width: 168px;
+    height: 32px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #000;
+    color: #fff;
+    font: 13px/1.3 var(--text);
+    font-feature-settings: normal;
+    letter-spacing: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    box-shadow: 0 10px 28px -14px rgba(0, 0, 0, 0.55);
+}
+.notch.classic .island,
+.notch.tucked .island {
+    box-shadow: none;
+}
+.island button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+.island svg {
+    display: block;
+    flex: none;
+}
+
+/* Album colour: a tint over the lower part of the island, as in the app */
+.island::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(transparent 38%, rgb(var(--glow, 0 0 0) / 0.7));
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease-out;
+}
+.island.glow::before {
+    opacity: 1;
+}
+
+/* ---------- Views: one shows at a time; they blur and shrink slightly when hidden ---------- */
+.v {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    z-index: 1;
+    width: var(--w);
+    translate: -50% 0;
+    opacity: 0;
+    filter: blur(8px);
+    scale: 0.94;
+    transform-origin: 50% 0;
+    pointer-events: none;
+    transition:
+        opacity 0.11s ease-out,
+        filter 0.16s ease-out,
+        scale 0.24s ease-out;
+}
+.v.on {
+    opacity: 1;
+    filter: blur(0);
+    scale: 1;
+    pointer-events: auto;
+    transition:
+        opacity 0.26s ease-out 0.08s,
+        filter 0.3s ease-out 0.05s,
+        scale 0.62s var(--spring) 0.03s;
+}
+.v.pill {
+    scale: 1; /* the closed pill only fades */
+}
+
+/* ---------- Rings (battery, timer, popups) ---------- */
+.ring {
+    position: relative;
+    flex: none;
+    display: grid;
+    place-items: center;
+}
+.ring svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    overflow: visible;
+}
+.ring .track {
+    stroke: rgba(255, 255, 255, 0.22);
+}
+.ring .arc {
+    stroke: var(--accent);
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: center;
+    transform-box: fill-box;
+    transition: stroke-dashoffset 0.6s var(--settle);
+}
+.ring.warn .arc {
+    stroke: #ff453a;
+}
+.ring.sm {
+    width: 14px;
+    height: 14px;
+    margin-left: 1px;
+}
+.ring.sm circle {
+    stroke-width: 2;
+}
+.ring.md {
+    width: 34px;
+    height: 34px;
+}
+.ring.md circle {
+    stroke-width: 4;
+}
+.ring.lg {
+    width: 100px;
+    height: 100px;
+}
+.ring.lg circle {
+    stroke-width: 6;
+}
+.ring .bolt {
+    fill: var(--accent);
+    opacity: 0;
+    transition: opacity 0.25s;
+}
+.charging .ring.sm:not(.timer) .bolt {
+    opacity: 1;
+}
+
+/* ---------- Closed: the pill, 32 tall ---------- */
+.pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px 0 10px;
+}
+.pill-clock {
+    flex: 1;
+    text-align: right;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.pill-clock.center {
+    text-align: center;
+}
+.pill-clock.timing {
+    color: var(--accent);
+}
+.cover {
+    flex: none;
+    background: linear-gradient(135deg, var(--ca, #3a3a3c), var(--cb, #1c1c1e));
+    transition: opacity 0.3s;
+}
+.cover.sm {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+}
+.island:not(.playing) .cover.sm {
+    opacity: 0.55;
+}
+.eq {
+    display: flex;
+    align-items: center;
+    height: 14px;
+}
+.eq i {
+    width: 3px;
+    height: 14px;
+    margin: 0 1px;
+    border-radius: 1.5px;
+    background: #fff;
+    scale: 1 0.32;
+    animation: eq 0.5s ease-in-out infinite alternate;
+    animation-play-state: paused;
+}
+.eq i:nth-child(1) {
+    animation-duration: 0.42s;
+}
+.eq i:nth-child(2) {
+    animation-duration: 0.58s;
+}
+.eq i:nth-child(3) {
+    animation-duration: 0.36s;
+}
+.playing .eq i {
+    animation-play-state: running;
+}
+@keyframes eq {
+    from {
+        scale: 1 0.32;
+    }
+    to {
+        scale: 1 1;
+    }
+}
+.pill.lyric {
+    padding: 0 14px;
+}
+.lyric-ico {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: var(--mute);
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+}
+.pill-line {
+    flex: 1;
+    min-width: 0;
+    margin: 0 12px 0 0;
+    overflow: hidden;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+/* ---------- Popups, 380 wide ---------- */
+.banner {
+    display: flex;
+    align-items: center;
+    height: 60px;
+    padding: 0 22px 0 16px;
+}
+.bn-ico {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+}
+.bn-ico svg {
+    width: 14px;
+    height: 14px;
+    fill: #fff;
+}
+.bn-ico svg.line,
+.vol-ico svg {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.bn-text {
+    flex: 1;
+    min-width: 0;
+    margin: 0 12px 0 14px;
+}
+.bn-text b,
+.bn-text span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.bn-text b {
+    font-size: 14.5px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+.bn-text span {
+    color: var(--mute);
+    font-size: 12px;
+}
+.bn-value {
+    font: 300 24px/1 var(--display);
+    font-variant-numeric: tabular-nums;
+}
+.volume {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 24px 0 20px;
+}
+.vol-ico {
+    width: 26px;
+}
+.vol-ico svg,
+#muteBtn svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.vbar {
+    flex: 1;
+    height: 5px;
+    margin-left: 10px;
+    border-radius: 2.5px;
+    background: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+}
+.vbar i {
+    display: block;
+    width: var(--vol, 50%);
+    height: 100%;
+    border-radius: inherit;
+    background: #fff;
+    transition: width 0.35s var(--settle);
+}
+
+/* A notification, in the popup and in the list */
+.card {
+    display: grid;
+    grid-template-columns: 26px 1fr;
+    column-gap: 12px;
+    margin: 0 6px;
+    padding: 10px 14px 11px 12px;
+    border-radius: 16px;
+    transition: background-color 0.15s;
+}
+.card:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+.app-ico {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    margin-top: 8px;
+    border-radius: 7px;
+    background: var(--c, #2c2c2e);
+    font-size: 13px;
+    font-weight: 600;
+}
+.card-text {
+    min-width: 0;
+}
+.card-text small {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--mute);
+    font-size: 11.5px;
+}
+.card-text b,
+.card-text p {
+    margin: 1px 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.card-text b {
+    display: block;
+    font: 600 15px/1.3 var(--display);
+}
+.card-text p {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12.5px;
+}
+
+/* ---------- Open: pages, 440 wide ---------- */
+.npage {
+    --w: 440px;
+}
+.head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 42px;
+    padding: 12px 12px 0 20px;
+}
+.head b {
+    font-size: 13px;
+    font-weight: 600;
+}
+.head .count {
+    margin-left: 8px;
+    color: var(--mute);
+    font-size: 12px;
+}
+.text-btn {
+    padding: 3px 6px !important;
+    color: var(--mute) !important;
+    font-size: 12px !important;
+    transition: color 0.15s;
+}
+.text-btn:hover {
+    color: #fff !important;
+}
+.pill-btn {
+    height: 28px;
+    padding: 0 14px !important;
+    border-radius: 14px;
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    transition:
+        opacity 0.15s,
+        scale 0.15s;
+}
+.pill-btn:hover {
+    opacity: 0.86;
+}
+.pill-btn:active {
+    scale: 0.96;
+}
+.pill-btn.alt {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #fff !important;
+}
+
+/* Music: 146 tall, 620 wide with lyrics beside the player */
+.music {
+    --w: 440px;
+}
+.island.lyr .music {
+    --w: 620px;
+}
+.media {
+    display: none;
+    height: 146px;
+    padding: 14px 20px 0;
+}
+.island.has-media .media {
+    display: flex;
+}
+.island.has-media .idle-clock {
+    display: none;
+}
+.player {
+    flex: none;
+    width: 400px;
+}
+.island.lyr .player {
+    width: 250px;
+}
+.prow {
+    position: relative;
+    height: 60px;
+}
+.cover.lg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+}
+.phead {
+    position: absolute;
+    inset: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 16px;
+    font-size: 12.5px;
+    font-variant-numeric: tabular-nums;
+}
+.phead b {
+    margin-left: 6px;
+    font-weight: 600;
+}
+.head-eq {
+    position: absolute;
+    top: 1px;
+    right: 0;
+}
+.titles {
+    position: absolute;
+    left: 74px;
+    right: 0;
+    bottom: 0;
+}
+.island.lyr .phead,
+.island.lyr .head-eq {
+    display: none;
+}
+.island.lyr .titles {
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.titles b,
+.titles span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.titles b {
+    font: 600 16px/1.3 var(--display);
+}
+.titles span {
+    margin: 1px 0 2px;
+    color: var(--mute);
+    font-size: 12.5px;
+}
+.pbatt {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-right: 10px;
+    color: var(--mute);
+    font-size: 12px;
+}
+.b-out {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.45);
+}
+.b-nub {
+    fill: rgba(255, 255, 255, 0.45);
+}
+.b-fill {
+    fill: #fff;
+    transition:
+        width 0.6s var(--settle),
+        fill 0.3s;
+}
+.charging .b-fill {
+    fill: var(--accent);
+}
+.low .b-fill {
+    fill: #ff453a;
+}
+.b-bolt {
+    fill: #fff;
+    stroke: #000;
+    stroke-width: 1.2;
+    stroke-linejoin: round;
+    paint-order: stroke;
+    opacity: 0;
+    transition: opacity 0.25s;
+}
+.charging .b-bolt {
+    opacity: 1;
+}
+.prog {
+    display: grid;
+    grid-template-columns: 46px 1fr 46px;
+    align-items: center;
+    height: 16px;
+    margin: 12px 0 2px;
+    color: var(--mute);
+    font-size: 11.5px;
+    font-variant-numeric: tabular-nums;
+}
+.prog > :last-child {
+    text-align: right;
+}
+.track {
+    height: 4px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    cursor: pointer;
+}
+.track i {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: #fff;
+}
+.ctrl {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 38px;
+}
+.mid {
+    display: flex;
+}
+.ib {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 36px;
+    border-radius: 18px;
+    transition:
+        background-color 0.15s,
+        scale 0.15s;
+}
+.ib:hover {
+    background: rgba(255, 255, 255, 0.11) !important;
+}
+.ib:active {
+    scale: 0.9;
+}
+#playBtn {
+    margin: 0 14px;
+}
+.ib.side {
+    width: 36px;
+}
+#lyrBtn {
+    margin-left: -9px;
+}
+#muteBtn {
+    margin-right: -9px;
+}
+.ib.side svg {
+    opacity: 0.7;
+}
+#lyrBtn svg {
+    fill: #fff;
+}
+#lyrBtn[aria-pressed="true"] svg {
+    fill: var(--accent);
+    opacity: 1;
+}
+#muteBtn svg {
+    width: 15px;
+    height: 15px;
+}
+.glyph {
+    fill: #fff;
+    stroke: #fff;
+    stroke-width: 1.4;
+    stroke-linejoin: round;
+}
+.lyrics-side {
+    position: relative;
+    display: none;
+    width: 330px;
+    height: 128px;
+}
+.island.lyr .lyrics-side {
+    display: block;
+}
+.lyrics-side::before {
+    content: "";
+    position: absolute;
+    left: 16px;
+    top: 4px;
+    bottom: 4px;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.14);
+}
+.lyrics {
+    height: 128px;
+    margin-left: 34px;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+    mask-image: linear-gradient(transparent, #000 22%, #000 78%, transparent);
+}
+.lines {
+    transition: translate 0.55s var(--settle);
+}
+.lines p {
+    margin: 5px 0;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.3;
+    opacity: 0.32;
+    transition: opacity 0.3s;
+}
+.lines p.on {
+    opacity: 1;
+}
+
+/* Music, nothing playing: a large clock, 98 tall */
+.idle-clock {
+    display: grid;
+    justify-items: center;
+    height: 98px;
+    padding-top: 12px;
+}
+.idle-clock > b {
+    font: 300 38px/1.2 var(--display);
+    font-variant-numeric: tabular-nums;
+}
+.idle-sub {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 2px;
+    color: var(--mute);
+    font-size: 12.5px;
+}
+.idle-sub .pbatt {
+    margin: 0;
+    font-size: 12.5px;
+}
+
+/* Shelf: 136 tall */
+.sh-row {
+    display: flex;
+    gap: 4px;
+    height: 84px;
+    margin: 0 14px 10px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.sh-row::-webkit-scrollbar {
+    display: none;
+}
+.file {
+    position: relative;
+    flex: none;
+    display: grid;
+    justify-items: center;
+    align-content: start;
+    width: 74px;
+    height: 84px;
+    padding-top: 7px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: grab;
+    outline-offset: -2px;
+    transition: background-color 0.15s;
+}
+.file:hover {
+    background: var(--soft-w);
+}
+.file:active {
+    cursor: grabbing;
+}
+.file.pop {
+    animation: pop 0.56s var(--spring) both;
+}
+@keyframes pop {
+    from {
+        opacity: 0;
+        scale: 0.6;
+    }
+}
+.thumb {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    background: var(--c, #3a3a3c) center / cover;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+.file .name {
+    display: -webkit-box;
+    max-height: 27px;
+    margin: 5px 5px 0;
+    overflow: hidden;
+    font-size: 11px;
+    line-height: 13.5px;
+    word-break: break-word;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+.file .x {
+    position: absolute;
+    top: 2px;
+    right: 6px;
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3a3a3c !important;
+    font-size: 12px;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity 0.14s;
+}
+.file:hover .x,
+.file:focus-visible .x {
+    opacity: 1;
+}
+.drop {
+    position: absolute;
+    inset: 42px 16px auto;
+    height: 82px;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    border: 1.5px dashed rgba(255, 255, 255, 0.25);
+    border-radius: 14px;
+    background: #000;
+    color: var(--mute);
+    font-size: 11.5px;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+        opacity 0.2s,
+        border-color 0.2s,
+        color 0.2s;
+}
+.drop svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.drop b {
+    margin: 6px 0 2px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+}
+.shelf.empty .drop,
+.shelf.over .drop {
+    opacity: 1;
+}
+.shelf.over .drop {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.shelf.over .drop svg {
+    animation: nudge 0.52s var(--spring);
+}
+@keyframes nudge {
+    from {
+        translate: 0 -6px;
+    }
+}
+
+/* Notifications */
+#nlist {
+    padding-bottom: 4px;
+}
+.empty {
+    padding: 8px 28px 14px;
+    color: var(--mute);
+    font-size: 12.5px;
+    text-align: center;
+}
+
+/* Focus timer: 124 tall */
+.timer {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    height: 124px;
+    padding: 0 20px 4px 22px;
+}
+.ring.lg > b {
+    position: absolute;
+    font: 400 23px/1 var(--display);
+    font-variant-numeric: tabular-nums;
+}
+.tside > b {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+}
+.chips {
+    display: flex;
+    gap: 6px;
+    margin-top: 9px;
+}
+.chip {
+    height: 22px;
+    padding: 0 10px !important;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    font-size: 12px !important;
+    transition: background-color 0.15s;
+}
+.chip:hover {
+    background: rgba(255, 255, 255, 0.18) !important;
+}
+.chip.on {
+    background: #fff !important;
+    color: #000 !important;
+}
+.btns {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+#tGo {
+    min-width: 72px;
+}
+
+/* Connections */
+.tiles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    height: 60px;
+    padding: 0 16px 8px;
+}
+.tile {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    padding: 0 10px !important;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08) !important;
+    text-align: left;
+    transition: background-color 0.15s;
+}
+.tile:hover {
+    background: rgba(255, 255, 255, 0.13) !important;
+}
+.dot {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    transition: background-color 0.2s;
+}
+.tile.on .dot {
+    background: var(--accent);
+}
+.dot svg,
+.dev-ico svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.tile-text {
+    flex: 1;
+    min-width: 0;
+}
+.tile-text b,
+.dev-text b {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+}
+.tile-text span,
+.dev-text span {
+    display: block;
+    overflow: hidden;
+    color: var(--mute);
+    font-size: 11.5px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.chev {
+    color: var(--mute);
+    font-size: 15px;
+}
+.dev {
+    display: flex;
+    align-items: center;
+    height: 46px;
+    margin: 0 16px;
+}
+.dev:last-child {
+    margin-bottom: 6px;
+}
+.dev-ico {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.18);
+}
+.dev-text {
+    flex: 1;
+    min-width: 0;
+    margin: 0 12px;
+}
+.dev-text b {
+    font-size: 13.5px;
+}
+.dev-text span {
+    font-size: 12px;
+}
+.dev .pill-btn + .pill-btn {
+    margin-left: 8px;
+}
+.dev-empty {
+    height: 36px;
+    padding-top: 4px;
+    color: var(--mute);
+    font-size: 12px;
+    text-align: center;
+}
+
+/* ---------- Page dots and page icons ---------- */
+.dots,
+.tabs {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    z-index: 2;
+    translate: -50% var(--y, 0px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+.dots {
+    display: flex;
+    height: 16px;
+}
+.island.open:not(.tabs-open) .dots,
+.island.open.tabs-open .tabs {
+    opacity: 1;
+    pointer-events: auto;
+    transition-delay: 0.08s;
+}
+.dots button {
+    display: grid;
+    place-items: center;
+    padding: 6px 3px !important;
+}
+.dots i {
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 2px;
+    background: #fff;
+    opacity: 0.35;
+    transition:
+        width 0.42s var(--spring),
+        opacity 0.2s;
+}
+.dots button[aria-pressed="true"] i {
+    width: 14px;
+    opacity: 1;
+}
+.tabs {
+    display: flex;
+    align-items: center;
+    height: 30px;
+    padding: 0 4px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.11);
+}
+.tabs button {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 24px;
+    border-radius: 12px;
+    transition: background-color 0.15s;
+}
+.tabs button:hover {
+    background: rgba(255, 255, 255, 0.12) !important;
+}
+.tabs svg {
+    width: 14px;
+    height: 14px;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.55;
+}
+.tabs button[aria-pressed="true"] svg {
+    opacity: 1;
+}
+.tabs .sep {
+    width: 1px;
+    height: 14px;
+    margin: 0 4px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Copies of the clock and cover that fly between the pill and the page */
+.ghost {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    z-index: 5;
+    margin: 0 !important;
+    transform-origin: 0 0;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .notch *,
+    .notch *::before {
+        transition-duration: 0.01ms !important;
+        animation: none !important;
+    }
+}
