@@ -163,18 +163,33 @@ public partial class MusicPage : NotchPage
     void UpdateBattery()
     {
         var power = _app.Power.State;
-        bool low = power.HasBattery && !power.IsPluggedIn && power.Percent <= 20;
-        double level = power.HasBattery ? power.Percent / 100.0 : 1;
+        var shown = power.HasBattery ? Visibility.Visible : Visibility.Collapsed;
+        BatteryGroup.Visibility = shown;
+        IdleBatteryGroup.Visibility = shown;
+        if (!power.HasBattery) return;
 
-        BatteryRing.Value = level;
-        BatteryRing.SetWarning(low);
-        IdleRing.Value = level;
-        IdleRing.SetWarning(low);
+        double level = power.Percent / 100.0;
+        BatteryGauge.Level = level;
+        BatteryGauge.PluggedIn = power.IsPluggedIn;
+        IdleGauge.Level = level;
+        IdleGauge.PluggedIn = power.IsPluggedIn;
 
-        IdleBattery.Text = !power.HasBattery ? ""
-            : power.IsCharging ? $"  ·  {power.Percent}%, charging"
-            : $"  ·  {power.Percent}%";
+        BatteryText.Text = $"{power.Percent}%";
+        IdleBattery.Text = power.IsCharging ? $"{power.Percent}% · Charging"
+                         : power.IsPluggedIn ? $"{power.Percent}% · Plugged in"
+                         : $"{power.Percent}%";
     }
+
+    // ---------- Morphing with the closed notch ----------
+
+    /// <summary>The clock and the cover fly between the closed pill and this page.</summary>
+    public override FrameworkElement? MorphTarget(string key) => key switch
+    {
+        MorphKeys.Clock when _np == null => IdleTime,
+        MorphKeys.Clock when Header.Visibility == Visibility.Visible => TimeText,
+        MorphKeys.Art when _np != null => Art,
+        _ => null,
+    };
 
     // ---------- Volume ----------
 
