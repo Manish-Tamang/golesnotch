@@ -81,6 +81,27 @@ static class Native
     [DllImport("user32.dll")]
     static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
 
+    [StructLayout(LayoutKind.Sequential)]
+    struct POINT
+    {
+        public int X, Y;
+    }
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    static extern bool GetCursorPos(out POINT point);
+
+    /// <summary>
+    /// Where the mouse pointer really is, in screen pixels. WPF's own idea of it goes stale
+    /// during drag and drop, and while the mouse is outside the window.
+    /// </summary>
+    public static bool TryGetCursorPos(out System.Windows.Point point)
+    {
+        bool ok = GetCursorPos(out POINT p);
+        point = new System.Windows.Point(p.X, p.Y);
+        return ok;
+    }
+
     delegate void WinEventProc(IntPtr hook, uint eventType, IntPtr hwnd, int idObject, int idChild,
                                uint eventThread, uint eventTime);
 
