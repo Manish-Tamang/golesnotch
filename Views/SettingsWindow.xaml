@@ -124,6 +124,23 @@
                         </c:SettingRow>
                         <Rectangle Style="{StaticResource SettingsDivider}"/>
 
+                        <c:SettingRow Title="Sleep when idle"
+                                      Description="Tuck into a thin strip at the top edge when you're not using it. Point at the strip to bring it back.">
+                            <Border Style="{StaticResource SegmentGroup}">
+                                <StackPanel x:Name="SleepChoices" Orientation="Horizontal">
+                                    <RadioButton Style="{StaticResource Segment}" Content="Off" Tag="0"
+                                                 Click="Sleep_Click"/>
+                                    <RadioButton Style="{StaticResource Segment}" Content="5 s" Tag="5"
+                                                 Click="Sleep_Click"/>
+                                    <RadioButton Style="{StaticResource Segment}" Content="10 s" Tag="10"
+                                                 Click="Sleep_Click"/>
+                                    <RadioButton Style="{StaticResource Segment}" Content="30 s" Tag="30"
+                                                 Click="Sleep_Click"/>
+                                </StackPanel>
+                            </Border>
+                        </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
+
                         <c:SettingRow Title="Page icons"
                                       Description="Show page icons when you hover the page dots.">
                             <CheckBox x:Name="PageIconsToggle" Style="{StaticResource Toggle}"
@@ -159,6 +176,12 @@
                 <TextBlock Style="{StaticResource SettingsHeader}" Text="Pages"/>
                 <Border Style="{StaticResource SettingsCard}">
                     <StackPanel>
+                        <c:SettingRow Title="File shelf"
+                                      Description="Drag files onto the notch to keep them close, then drag them out into a chat, an email or another folder.">
+                            <CheckBox x:Name="ShelfPageToggle" Style="{StaticResource Toggle}"
+                                      Click="Toggle_Click"/>
+                        </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
                         <c:SettingRow Title="Notifications page"
                                       Description="A list of your Windows notifications in the open notch.">
                             <CheckBox x:Name="NotificationsPageToggle" Style="{StaticResource Toggle}"
