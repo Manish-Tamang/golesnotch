@@ -26,11 +26,18 @@ public sealed class AppSettings
     public bool HideInFullscreen { get; set; } = true;
     /// <summary>Hovering the page dots swaps them for a row of page icons.</summary>
     public bool PageIcons { get; set; } = true;
+    /// <summary>
+    /// Seconds the closed notch waits, untouched, before it tucks itself into a thin strip
+    /// against the top edge. 0 keeps it awake.
+    /// </summary>
+    public int SleepAfterSeconds { get; set; } = 10;
 
     // Features
     public bool ShowNotificationsPage { get; set; } = true;
     public bool ShowTimerPage { get; set; } = true;
     public bool ShowDevicesPage { get; set; } = true;
+    /// <summary>A page that holds files dragged onto the notch.</summary>
+    public bool ShowShelfPage { get; set; } = true;
     public bool Lyrics { get; set; } = true;
     /// <summary>Tints the notch with the album cover's colour while music shows.</summary>
     public bool AlbumGlow { get; set; } = true;
@@ -47,6 +54,7 @@ public sealed class AppSettings
         if (double.IsNaN(TopGap)) TopGap = 8;
         CollapsedWidth = Math.Clamp(CollapsedWidth, MinWidth, MaxWidth);
         TopGap = Math.Clamp(TopGap, 0, MaxTopGap);
+        SleepAfterSeconds = Math.Clamp(SleepAfterSeconds, 0, 600);
         if (!Theme.IsValidColor(Accent)) Accent = Theme.DefaultAccent;
     }
 }
