@@ -18,13 +18,20 @@
       The island never changes its layout size. Its black body (IslandBody) is a rounded
       rectangle that moves on springs and also clips ContentHost. The views below are
       stacked; the one that matches the current mode is faded in.
+
+      Files dragged onto the island land on the shelf page.
     -->
     <Grid x:Name="Island" Width="720" Height="370"
           HorizontalAlignment="Center" VerticalAlignment="Top"
           MouseEnter="Island_MouseEnter"
           MouseLeave="Island_MouseLeave"
           MouseLeftButtonUp="Island_MouseLeftButtonUp"
-          MouseWheel="Island_MouseWheel">
+          MouseWheel="Island_MouseWheel"
+          AllowDrop="True"
+          DragEnter="Island_DragOver"
+          DragOver="Island_DragOver"
+          DragLeave="Island_DragLeave"
+          Drop="Island_Drop">
 
         <c:IslandShape x:Name="IslandBody"/>
 
@@ -82,6 +89,9 @@
             <!-- Page icons, which replace the dots while the mouse is over them -->
             <c:PageTabs x:Name="Tabs" HorizontalAlignment="Center" VerticalAlignment="Top"
                         Opacity="0" IsHitTestVisible="False"/>
+
+            <!-- Copies of the clock, cover and timer that fly between the pill and the open page -->
+            <Canvas x:Name="MorphLayer" IsHitTestVisible="False"/>
         </Grid>
     </Grid>
 </Window>
