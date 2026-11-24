@@ -10,9 +10,10 @@ using Windows.Devices.Radios;
 namespace Notch.Views;
 
 /// <summary>
-/// Wi-Fi and Bluetooth switches, and the connected drives, phones and Bluetooth devices
-/// with Open and Eject. It covers what the taskbar's quick settings and "Safely remove
-/// hardware" icon are normally for.
+/// Wi-Fi and Bluetooth switches, volume and brightness, and the connected drives, phones
+/// and Bluetooth devices with Open and Eject. It covers what the taskbar's quick settings
+/// and "Safely remove hardware" icon are normally for. The Bluetooth tile's arrow swaps
+/// in <see cref="BluetoothPanel"/>.
 /// </summary>
 public partial class DevicesPage : NotchPage
 {
@@ -21,12 +22,22 @@ public partial class DevicesPage : NotchPage
     const double RowHeight = 46;
     const double EmptyHeight = 30;
     const double BottomPadding = 6;
+    const double SliderRowHeight = 36;
+    const double SlidersPadding = 6;
+    const double PanelSlide = 24;
     const int MaxRows = 4;
 
     static readonly Brush OffBrush = CreateOffBrush();
 
     readonly DeviceService _devices;
     readonly RadioService _radios;
+    readonly VolumeService _volume;
+    readonly BrightnessService _brightness;
+    readonly BluetoothPanel _bluetoothPanel;
+    readonly TranslateTransform _mainShift = new();
+    readonly TranslateTransform _panelShift = new();
+    double _mainHeight;
+    bool _showingBluetooth;
 
     public DevicesPage(AppServices app)
     {
@@ -34,9 +45,29 @@ public partial class DevicesPage : NotchPage
         IconGlyph = "\uE772";
         _devices = app.Devices;
         _radios = app.Radios;
+        _volume = app.Volume;
+        _brightness = app.Brightness;
+
+        _bluetoothPanel = new BluetoothPanel(app)
+        {
+            Visibility = Visibility.Collapsed,
+            Opacity = 0,
+            RenderTransform = _panelShift,
+        };
+        _bluetoothPanel.HeightChanged += UpdateHeight;
+        _bluetoothPanel.BackRequested += () => ShowBluetooth(false, animate: true);
+        Root.Children.Add(_bluetoothPanel);
+        MainPanel.RenderTransform = _mainShift;
+
+        VolumeSlider.ValueChanging += level => _volume.SetLevel(level);
+        BrightnessSlider.ValueChanging += level => _brightness.Set(level);
 
         _devices.Changed += () => Dispatcher.InvokeAsync(Rebuild);
         _radios.Changed += () => Dispatcher.InvokeAsync(UpdateRadios);
+        _volume.Changed += () => Dispatcher.InvokeAsync(UpdateVolume);
+        _brightness.Changed += () => Dispatcher.InvokeAsync(UpdateBrightness);
+        UpdateVolume();
+        UpdateBrightness();
         Rebuild();
     }
 
@@ -50,6 +81,79 @@ public partial class DevicesPage : NotchPage
 
     // The Wi-Fi network may have changed since the page was last open.
     public override void OnShown() => UpdateRadios();
+
+    public override void OnHidden()
+    {
+        if (_showingBluetooth) ShowBluetooth(false, animate: false);
+    }
+
+    // ---------- Volume and brightness ----------
+
+    void UpdateVolume()
+    {
+        VolumeIcon.Text = VolumeBanner.GlyphFor(_volume.Level, _volume.IsMuted);
+        VolumeSlider.Dimmed = _volume.IsMuted;
+        VolumeSlider.Show(_volume.Level, animate: IsVisible);
+    }
+
+    void UpdateBrightness()
+    {
+        var visibility = _brightness.IsSupported ? Visibility.Visible : Visibility.Collapsed;
+        if (BrightnessRow.Visibility != visibility)
+        {
+            BrightnessRow.Visibility = visibility;
+            Rebuild();
+        }
+        BrightnessSlider.Show(_brightness.Level, animate: IsVisible);
+    }
+
+    void Mute_Click(object sender, RoutedEventArgs e) => _volume.ToggleMute();
+
+    // ---------- Bluetooth panel ----------
+
+    void ShowBluetooth(bool show, bool animate)
+    {
+        if (show == _showingBluetooth) return;
+        _showingBluetooth = show;
+
+        UIElement incoming = show ? _bluetoothPanel : MainPanel;
+        UIElement outgoing = show ? MainPanel : _bluetoothPanel;
+        var incomingShift = show ? _panelShift : _mainShift;
+        var outgoingShift = show ? _mainShift : _panelShift;
+        double direction = show ? 1 : -1;
+
+        if (show) _bluetoothPanel.Open();
+        else _bluetoothPanel.Close();
+
+        incoming.Visibility = Visibility.Visible;
+        incoming.IsHitTestVisible = true;
+        outgoing.IsHitTestVisible = false;
+
+        if (!animate)
+        {
+            Motion.Set(incoming, OpacityProperty, 1);
+            Motion.Set(incomingShift, TranslateTransform.XProperty, 0);
+            Motion.Set(outgoing, OpacityProperty, 0);
+            outgoing.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            Motion.To(outgoingShift, TranslateTransform.XProperty, -direction * PanelSlide, 220);
+            Motion.To(outgoing, OpacityProperty, 0, 130, completed: () =>
+            {
+                if (!outgoing.IsHitTestVisible) outgoing.Visibility = Visibility.Collapsed;
+            });
+            Motion.Set(incoming, OpacityProperty, 0);
+            Motion.Set(incomingShift, TranslateTransform.XProperty, direction * PanelSlide);
+            Motion.To(incoming, OpacityProperty, 1, 240, delayMs: 60);
+            Motion.To(incomingShift, TranslateTransform.XProperty, 0, 560, Motion.Spring());
+        }
+
+        UpdateHeight();
+    }
+
+    void UpdateHeight()
+        => PageHeight = _showingBluetooth ? _bluetoothPanel.PanelHeight : _mainHeight;
 
     // ---------- Wi-Fi and Bluetooth ----------
 
@@ -105,7 +209,7 @@ public partial class DevicesPage : NotchPage
     // Windows' list of Wi-Fi networks, the one the taskbar's network icon opens.
     void WifiMore_Click(object sender, RoutedEventArgs e) => OpenLink("ms-availablenetworks:");
 
-    void BluetoothMore_Click(object sender, RoutedEventArgs e) => OpenLink("ms-settings:bluetooth");
+    void BluetoothMore_Click(object sender, RoutedEventArgs e) => ShowBluetooth(true, animate: true);
 
     static void OpenLink(string link)
     {
@@ -130,9 +234,11 @@ public partial class DevicesPage : NotchPage
             DeviceList.Children.Add(CreateRow(device));
 
         EmptyText.Visibility = devices.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-        PageHeight = HeaderHeight + TilesHeight
-                   + (devices.Count == 0 ? EmptyHeight : devices.Count * RowHeight)
-                   + BottomPadding;
+        double sliders = SliderRowHeight * (_brightness.IsSupported ? 2 : 1) + SlidersPadding;
+        _mainHeight = HeaderHeight + TilesHeight + sliders
+                    + (devices.Count == 0 ? EmptyHeight : devices.Count * RowHeight)
+                    + BottomPadding;
+        UpdateHeight();
 
         UpdateRadios(); // the Bluetooth tile names the connected device
     }
