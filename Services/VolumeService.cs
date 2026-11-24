@@ -45,6 +45,53 @@ public sealed class VolumeService
         _rebind = new Timer(_ => Bind(), null, TimeSpan.Zero, TimeSpan.FromSeconds(3));
     }
 
+    double? _pendingLevel;
+    bool _applyingLevel;
+
+    /// <summary>Sets the volume, 0 to 1, and unmutes. Rapid calls (a drag) are coalesced.</summary>
+    public void SetLevel(double level)
+    {
+        level = Math.Clamp(level, 0, 1);
+        lock (_gate)
+        {
+            _pendingLevel = level;
+            if (_applyingLevel) return;
+            _applyingLevel = true;
+        }
+
+        Task.Run(() =>
+        {
+            while (true)
+            {
+                IAudioEndpointVolume? endpoint;
+                double next;
+                bool unmute;
+                lock (_gate)
+                {
+                    if (_pendingLevel is not { } pending)
+                    {
+                        _applyingLevel = false;
+                        return;
+                    }
+                    next = pending;
+                    _pendingLevel = null;
+                    endpoint = _endpoint;
+                    unmute = IsMuted;
+                }
+
+                try
+                {
+                    var context = Guid.Empty;
+                    endpoint?.SetMasterVolumeLevelScalar((float)next, ref context);
+                    if (unmute) endpoint?.SetMute(false, ref context);
+                }
+                catch
+                {
+                }
+            }
+        });
+    }
+
     public void ToggleMute()
     {
         Task.Run(() =>
