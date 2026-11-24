@@ -24,6 +24,8 @@ public sealed class AppServices
     public RadioService Radios { get; } = new();
     public FocusTimer Timer { get; } = new();
     public ShelfService Shelf { get; } = new();
+    public BrightnessService Brightness { get; } = new();
+    public BluetoothService Bluetooth { get; } = new();
 
     /// <summary>Starts the services that watch Windows. Call from the UI thread.</summary>
     public async Task StartAsync()
@@ -31,6 +33,8 @@ public sealed class AppServices
         Power.Start();
         Devices.Start();
         Volume.Start();
+        Brightness.Start();
+        Bluetooth.Start();
 
         try
         {
