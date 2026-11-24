@@ -20,8 +20,8 @@ Written in C# with WPF. It runs natively, uses no web view, and has no dependenc
 - **Notifications.** New Windows notifications pop up in the notch. Click one to enlarge it and read the whole message, then open the app or dismiss it. A page lists the recent ones.
 - **Focus timer.** A countdown with 15, 25, 45 and 60 minute presets. The time left shows in the closed notch.
 - **Charger and battery.** A short popup when the charger is plugged in or removed, and at 20% battery. The open notch shows the battery and percentage, with a bolt while charging.
-- **Volume popup.** Change the volume and the notch shows the level on a bar. The music page has a mute button.
-- **Wi-Fi and Bluetooth.** Switch either on or off from the notch, and open Windows' list of networks or Bluetooth devices.
+- **Volume and brightness.** Change either and the notch shows the level on a bar you can drag or scroll. The Connections page has sliders for both, and the music page has a mute button. Brightness works with built-in laptop screens and with external monitors that support DDC/CI.
+- **Wi-Fi and Bluetooth.** Switch either on or off from the notch. The Bluetooth arrow opens your paired devices: connect or disconnect headphones and speakers, remove devices, and pair new ones without leaving the notch.
 - **Devices.** A popup when a USB drive, phone or Bluetooth device connects or disconnects; click it to open the device. The same page lists what is connected, with Open and Eject. Useful if you run without the taskbar tray.
 - **Settings window.** Style, width, gap, accent colour, hover or click to open, animation speed, and a switch for every feature.
 - **Stays on top, out of the way.** It keeps itself in front of other windows, never takes keyboard focus, doesn't appear in the taskbar or Alt+Tab, lets clicks through around the pill, and hides while a fullscreen app is in front.
@@ -108,6 +108,7 @@ Right-click the notch and choose **Settings**, or hover the page dots and click 
 | Charger and battery popups | On | |
 | Device popups | On | |
 | Volume popup | On | |
+| Brightness popup | On | |
 
 Settings are stored in `%APPDATA%\Notch\settings.json`, and the shelf's list of files in `shelf.json` beside it.
 
@@ -128,6 +129,9 @@ Settings are stored in `%APPDATA%\Notch\settings.json`, and the shelf's list of 
 - The notch hides for fullscreen apps, not for task switchers or launchers. If it hides for a tool it shouldn't, add that tool's process name to `ShellProcesses` in `Interop/Native.cs`, or turn off **Hide in fullscreen**.
 - Windows draws a few of its own screens (Alt+Tab, Start, Task View, the lock screen) in a layer above every app, so the notch can be covered while those are open. It is back as soon as they close.
 - The Devices page lists storage and Bluetooth devices. Other USB devices, such as mice and keyboards, aren't listed.
+- Connect and Disconnect are offered for Bluetooth headphones and speakers only; Windows connects mice, keyboards and phones by itself.
+- Devices that need a PIN typed on the PC (some keyboards and older devices) have to be paired in Windows Settings, because the notch doesn't take typing.
+- Brightness controls the built-in screen, or the primary monitor over DDC/CI. Monitors without DDC/CI, or with it turned off in their menu, can't be dimmed from the notch.
 - The shelf takes files. Text or images dragged from a web page that aren't files are ignored.
 - Dragging a file from the shelf into a folder on the same drive moves it, as it does in Explorer; it then leaves the shelf.
 
