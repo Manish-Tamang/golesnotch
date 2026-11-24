@@ -12,9 +12,13 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AssemblyName>Notch</AssemblyName>
     <RootNamespace>Notch</RootNamespace>
-    <Version>0.3.0</Version>
+    <Version>0.4.0</Version>
     <!-- The website and local publish output aren't part of the app. -->
     <DefaultItemExcludes>$(DefaultItemExcludes);site/**;publish/**</DefaultItemExcludes>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="10.0.15" />
+  </ItemGroup>
 
 </Project>
