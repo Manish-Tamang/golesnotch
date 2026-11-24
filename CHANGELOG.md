@@ -2,6 +2,15 @@
 
 All notable changes to Notch. Versions follow [Semantic Versioning](https://semver.org); downloads are on the [Releases](https://github.com/Manish-Tamang/golesnotch/releases) page.
 
+## 0.4.0 — 2026-11-24
+
+### Added
+
+- **Brightness.** Change the screen brightness and the notch shows the level, the same way it does for the volume. Works with the brightness keys on laptops; external monitors that support DDC/CI can be set from the notch too. Turn the popup off in Settings → Features.
+- **Volume and brightness sliders** on the Connections page, under the Wi-Fi and Bluetooth tiles.
+- **Drag the volume and brightness popups.** Drag along the bar, or scroll over the popup, to set the level without opening anything.
+- **Bluetooth in the notch.** The arrow on the Bluetooth tile opens a list of your paired devices. Connect or disconnect headphones and speakers, and remove devices you no longer use. "Add device" finds nearby devices to pair; when a device shows a code, the notch shows it too so you can confirm. Devices that need a PIN typed on the PC are sent to Windows Settings.
+
 ## 0.3.0 — 2026-11-17
 
 ### Added
