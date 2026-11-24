@@ -238,6 +238,12 @@
                                       Click="Toggle_Click"/>
                         </c:SettingRow>
                         <Rectangle Style="{StaticResource SettingsDivider}"/>
+                        <c:SettingRow Title="Brightness popup"
+                                      Description="Show the level while you change the screen brightness.">
+                            <CheckBox x:Name="BrightnessPopupsToggle" Style="{StaticResource Toggle}"
+                                      Click="Toggle_Click"/>
+                        </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
                         <c:SettingRow Title="Device popups"
                                       Description="When a drive, phone or Bluetooth device connects or disconnects.">
                             <CheckBox x:Name="DevicePopupsToggle" Style="{StaticResource Toggle}"
