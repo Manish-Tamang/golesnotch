@@ -210,6 +210,12 @@ public partial class NotchWindow : Window
         app.Devices.Connected += device => Dispatcher.InvokeAsync(() => ShowDeviceBanner(device, connected: true));
         app.Devices.Disconnected += device => Dispatcher.InvokeAsync(() => ShowDeviceBanner(device, connected: false));
         app.Volume.Adjusted += () => Dispatcher.InvokeAsync(ShowVolume);
+        app.Brightness.Adjusted += () => Dispatcher.InvokeAsync(ShowBrightness);
+        _volumeBanner.LevelChanging += (kind, level) =>
+        {
+            if (kind == LevelKind.Volume) _app.Volume.SetLevel(level);
+            else _app.Brightness.Set(level);
+        };
         app.Timer.Changed += UpdatePill;
         app.Timer.Finished += ShowTimerFinished;
         app.LyricsSession.Changed += UpdatePill;
@@ -657,8 +663,17 @@ public partial class NotchWindow : Window
         }
     }
 
-    // Scrolling down, or swiping two fingers up, goes to the next page.
-    void Island_MouseWheel(object sender, MouseWheelEventArgs e) => OnScroll(-e.Delta);
+    // Scrolling down, or swiping two fingers up, goes to the next page. Over the volume or
+    // brightness popup it changes the level instead.
+    void Island_MouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (_mode == Mode.Hud && _volumeBanner.Visibility == Visibility.Visible)
+        {
+            _volumeBanner.Nudge(Math.Sign(e.Delta) * 0.04);
+            return;
+        }
+        OnScroll(-e.Delta);
+    }
 
     /// <summary>Raw window messages. Used for sideways scrolling, which WPF doesn't surface.</summary>
     IntPtr OnWindowMessage(IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -869,11 +884,26 @@ public partial class NotchWindow : Window
         if (showingCard) return;
 
         // Glide the bar if the popup is already up; otherwise start at the right level.
-        bool alreadyShowing = _mode == Mode.Hud && _volumeBanner.Visibility == Visibility.Visible;
+        bool alreadyShowing = IsShowingLevel(LevelKind.Volume);
         ShowHudContent(_volumeBanner);
         _volumeBanner.Set(_app.Volume.Level, _app.Volume.IsMuted, animate: alreadyShowing);
         ShowHud(VolumeHeight, TimeSpan.FromSeconds(1.6));
     }
+
+    /// <summary>The brightness was changed: show the level, the same way as the volume.</summary>
+    void ShowBrightness()
+    {
+        if (!Settings.BrightnessPopups || !CanShowHud) return;
+        if (_mode == Mode.Hud && _hudCard.Visibility == Visibility.Visible) return;
+
+        bool alreadyShowing = IsShowingLevel(LevelKind.Brightness);
+        ShowHudContent(_volumeBanner);
+        _volumeBanner.SetBrightness(_app.Brightness.Level, animate: alreadyShowing);
+        ShowHud(VolumeHeight, TimeSpan.FromSeconds(1.6));
+    }
+
+    bool IsShowingLevel(LevelKind kind)
+        => _mode == Mode.Hud && _volumeBanner.Visibility == Visibility.Visible && _volumeBanner.Kind == kind;
 
     void ShowChargerBanner(bool plugged)
     {
