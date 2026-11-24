@@ -64,6 +64,7 @@ public partial class SettingsWindow : Window
         PowerPopupsToggle.IsChecked = s.PowerPopups;
         DevicePopupsToggle.IsChecked = s.DevicePopups;
         VolumePopupsToggle.IsChecked = s.VolumePopups;
+        BrightnessPopupsToggle.IsChecked = s.BrightnessPopups;
 
         string version = typeof(SettingsWindow).Assembly.GetName().Version?.ToString(3) ?? "";
         VersionRow.Description = $"Version {version}";
@@ -177,6 +178,7 @@ public partial class SettingsWindow : Window
             s.PowerPopups = PowerPopupsToggle.IsChecked == true;
             s.DevicePopups = DevicePopupsToggle.IsChecked == true;
             s.VolumePopups = VolumePopupsToggle.IsChecked == true;
+            s.BrightnessPopups = BrightnessPopupsToggle.IsChecked == true;
         });
     }
 
