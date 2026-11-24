@@ -1,18 +1,21 @@
 <v:NotchPage x:Class="Notch.Views.DevicesPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:v="clr-namespace:Notch.Views">
-    <Grid VerticalAlignment="Top">
+             xmlns:v="clr-namespace:Notch.Views"
+             xmlns:c="clr-namespace:Notch.Controls">
+    <Grid x:Name="Root" VerticalAlignment="Top">
+    <Grid x:Name="MainPanel" VerticalAlignment="Top">
         <Grid.RowDefinitions>
             <RowDefinition Height="42"/>    <!-- title -->
             <RowDefinition Height="60"/>    <!-- Wi-Fi and Bluetooth switches -->
+            <RowDefinition Height="Auto"/>  <!-- volume and brightness -->
             <RowDefinition Height="Auto"/>  <!-- connected devices -->
         </Grid.RowDefinitions>
 
         <TextBlock x:Name="HeaderText" Text="Connections" FontSize="13" FontWeight="SemiBold"
                    Margin="20,12,12,0" VerticalAlignment="Center"/>
 
-        <!-- Click a tile to switch the radio on or off. The arrow opens Windows' own list. -->
+        <!-- Click a tile to switch the radio on or off. Wi-Fi's arrow opens Windows' list; Bluetooth's opens the Bluetooth panel. -->
         <Grid Grid.Row="1" Margin="16,0,16,8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -71,11 +74,34 @@
             </Border>
         </Grid>
 
-        <!-- One row per connected device, built in code -->
-        <StackPanel x:Name="DeviceList" Grid.Row="2" Margin="16,0,16,0"/>
+        <StackPanel Grid.Row="2" Margin="12,0,20,6">
+            <Grid Height="36">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="34"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Style="{StaticResource IconButton}" Width="34" Height="30" Click="Mute_Click">
+                    <TextBlock x:Name="VolumeIcon" FontFamily="{StaticResource IconFont}" FontSize="15"/>
+                </Button>
+                <c:LevelSlider x:Name="VolumeSlider" Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center"/>
+            </Grid>
+            <Grid x:Name="BrightnessRow" Height="36" Visibility="Collapsed">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="34"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="&#xE706;" FontFamily="{StaticResource IconFont}" FontSize="15"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <c:LevelSlider x:Name="BrightnessSlider" Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center"/>
+            </Grid>
+        </StackPanel>
 
-        <TextBlock x:Name="EmptyText" Grid.Row="2" Text="No drives, phones or Bluetooth devices connected"
+        <!-- One row per connected device, built in code -->
+        <StackPanel x:Name="DeviceList" Grid.Row="3" Margin="16,0,16,0"/>
+
+        <TextBlock x:Name="EmptyText" Grid.Row="3" Text="No drives, phones or Bluetooth devices connected"
                    FontSize="12" Foreground="{StaticResource MutedBrush}"
                    HorizontalAlignment="Center" Margin="0,4,0,0"/>
+    </Grid>
     </Grid>
 </v:NotchPage>
