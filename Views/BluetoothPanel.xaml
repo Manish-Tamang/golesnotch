@@ -1,0 +1,29 @@
+<UserControl x:Class="Notch.Views.BluetoothPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             VerticalAlignment="Top">
+    <Grid VerticalAlignment="Top">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="42"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid Margin="10,12,12,0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Style="{StaticResource IconButton}" Width="30" Height="28" Click="Back_Click">
+                    <TextBlock Text="&#xE76B;" FontFamily="{StaticResource IconFont}" FontSize="11"
+                               Foreground="{StaticResource MutedBrush}"/>
+                </Button>
+                <TextBlock x:Name="TitleText" Text="Bluetooth" FontSize="13" FontWeight="SemiBold"
+                           Margin="4,0,0,0" VerticalAlignment="Center"/>
+            </StackPanel>
+            <Button x:Name="AddButton" Style="{StaticResource TextButton}" Content="Add device"
+                    HorizontalAlignment="Right" VerticalAlignment="Center" Click="Add_Click"/>
+        </Grid>
+
+        <ScrollViewer x:Name="Scroller" Grid.Row="1" MaxHeight="232" Focusable="False"
+                      VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel x:Name="List" Margin="16,0,16,6"/>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
