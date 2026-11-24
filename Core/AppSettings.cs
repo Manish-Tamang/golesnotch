@@ -44,6 +44,7 @@ public sealed class AppSettings
     public bool NotificationPopups { get; set; } = true;
     public bool PowerPopups { get; set; } = true;
     public bool VolumePopups { get; set; } = true;
+    public bool BrightnessPopups { get; set; } = true;
     /// <summary>Popups when a USB drive, phone or Bluetooth device connects or disconnects.</summary>
     public bool DevicePopups { get; set; } = true;
 
