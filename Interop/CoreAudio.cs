@@ -14,8 +14,16 @@ class MMDeviceEnumerator
 [ComImport, Guid("A95664D2-9614-4F35-A746-DE8DB63617E6"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 interface IMMDeviceEnumerator
 {
-    [PreserveSig] int EnumAudioEndpoints(int dataFlow, int stateMask, out IntPtr devices);
+    [PreserveSig] int EnumAudioEndpoints(int dataFlow, int stateMask, out IMMDeviceCollection? devices);
     [PreserveSig] int GetDefaultAudioEndpoint(int dataFlow, int role, out IMMDevice? device);
+    [PreserveSig] int GetDevice([MarshalAs(UnmanagedType.LPWStr)] string id, out IMMDevice? device);
+}
+
+[ComImport, Guid("0BD7A1BE-7A1A-44DB-8397-CC5392387B5E"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+interface IMMDeviceCollection
+{
+    [PreserveSig] int GetCount(out uint count);
+    [PreserveSig] int Item(uint index, out IMMDevice? device);
 }
 
 [ComImport, Guid("D666063F-1587-4E43-81F1-B948E807363F"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
@@ -23,8 +31,72 @@ interface IMMDevice
 {
     [PreserveSig] int Activate(ref Guid interfaceId, int classContext, IntPtr activationParams,
                                [MarshalAs(UnmanagedType.IUnknown)] out object? instance);
-    [PreserveSig] int OpenPropertyStore(int access, out IntPtr properties);
+    [PreserveSig] int OpenPropertyStore(int access, out IPropertyStore? properties);
     [PreserveSig] int GetId([MarshalAs(UnmanagedType.LPWStr)] out string? id);
+    [PreserveSig] int GetState(out int state);
+}
+
+[ComImport, Guid("886D8EEB-8CF2-4446-8D02-CDBA1DBDCF99"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+interface IPropertyStore
+{
+    [PreserveSig] int GetCount(out uint count);
+    [PreserveSig] int GetAt(uint index, out PropertyKey key);
+    [PreserveSig] int GetValue(ref PropertyKey key, out PropVariant value);
+}
+
+[StructLayout(LayoutKind.Sequential)]
+struct PropertyKey
+{
+    public Guid FormatId;
+    public int PropertyId;
+
+    public PropertyKey(Guid formatId, int propertyId)
+    {
+        FormatId = formatId;
+        PropertyId = propertyId;
+    }
+}
+
+/// <summary>Only the parts used here: the type tag and the pointer-sized value. 24 bytes on x64.</summary>
+[StructLayout(LayoutKind.Explicit, Size = 24)]
+struct PropVariant
+{
+    [FieldOffset(0)] public ushort Type;
+    [FieldOffset(8)] public IntPtr Pointer;
+}
+
+[ComImport, Guid("2A07407E-6497-4A18-9787-32F79BD0D98F"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+interface IDeviceTopology
+{
+    [PreserveSig] int GetConnectorCount(out uint count);
+    [PreserveSig] int GetConnector(uint index, out IConnector? connector);
+}
+
+[ComImport, Guid("9C2C4058-23F5-41DE-877A-DF3AF236A09E"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+interface IConnector
+{
+    [PreserveSig] int GetConnectorType(out int type);
+    [PreserveSig] int GetDataFlow(out int flow);
+    [PreserveSig] int ConnectTo(IConnector other);
+    [PreserveSig] int Disconnect();
+    [PreserveSig] int IsConnected([MarshalAs(UnmanagedType.Bool)] out bool connected);
+    [PreserveSig] int GetConnectedTo(out IConnector? other);
+    [PreserveSig] int GetConnectorIdConnectedTo([MarshalAs(UnmanagedType.LPWStr)] out string? id);
+    [PreserveSig] int GetDeviceIdConnectedTo([MarshalAs(UnmanagedType.LPWStr)] out string? id);
+}
+
+[ComImport, Guid("28F54685-06FD-11D2-B27A-00A0C9223196"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+interface IKsControl
+{
+    [PreserveSig] int KsProperty(ref KsPropertyHeader property, uint propertyLength, IntPtr data, uint dataLength, out uint returned);
+}
+
+[StructLayout(LayoutKind.Sequential)]
+struct KsPropertyHeader
+{
+    public Guid Set;
+    public uint Id;
+    public uint Flags;
 }
 
 [ComImport, Guid("5CDF2C82-841E-4546-9722-0CF74078229A"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
