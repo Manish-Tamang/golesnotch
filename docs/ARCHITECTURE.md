@@ -62,6 +62,10 @@ A page is a `UserControl` that derives from `Views/NotchPage`. It reports how bi
 
 `Views/ShelfPage` holds files dragged onto the notch; `Services/ShelfService` keeps their paths (never copies) in `%APPDATA%\Notch\shelf.json`. The notch window, not the page, is the drop target: dragging files over the island opens it on the shelf, whatever mode it was in. Each file can be clicked to open it or dragged back out as an ordinary file drag, so the drop target chooses whether to copy or move it, like Explorer does. Files that were moved away drop off the shelf. While a file is being dragged out, the notch closes as soon as the pointer leaves it so the window underneath can take the drop. Thumbnails come from Explorer's own thumbnail cache through `Interop/ShellThumbnail`.
 
+### Bluetooth audio
+
+Windows has no public API to connect a paired pair of headphones. `Interop/BluetoothAudio` does what Windows' own Connect button does: each Bluetooth audio endpoint leads, through its device topology, to the driver's kernel-streaming filter, which accepts a one-shot reconnect or disconnect request. Endpoints are matched to Bluetooth devices by the container id they share.
+
 ### Adding a page
 
 1. Create `Views/MyPage.xaml` with `<v:NotchPage ...>` as its root, and `MyPage.xaml.cs` deriving from `NotchPage`. Take `AppServices` in the constructor.
@@ -87,6 +91,8 @@ Services live in `Services/` and know nothing about the UI. `AppServices` create
 | `FocusTimer` | A `DispatcherTimer` | Counts down against the clock, so it stays accurate if the UI is busy. |
 | `StartupRegistration` | The registry's Run key | Per user; no admin rights. |
 | `ShelfService` | `shelf.json` | The file shelf's paths. UI thread only. |
+| `BrightnessService` | WMI (`WmiMonitorBrightness`), or DDC/CI (`Interop/MonitorBrightness`) | The built-in screen's brightness and its change events; the primary external monitor otherwise. Rapid changes from a drag are coalesced. |
+| `BluetoothService` | `DeviceWatcher` over Bluetooth association endpoints | Paired devices, and nearby ones while the Add device list is open. Pairs (with code confirmation), unpairs, and connects or disconnects audio devices through `Interop/BluetoothAudio`. |
 
 Services may raise events on any thread. Views always switch to the UI thread with `Dispatcher.InvokeAsync` before touching controls.
 
