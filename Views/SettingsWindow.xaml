@@ -199,6 +199,12 @@
                             <CheckBox x:Name="DevicesPageToggle" Style="{StaticResource Toggle}"
                                       Click="Toggle_Click"/>
                         </c:SettingRow>
+                        <Rectangle Style="{StaticResource SettingsDivider}"/>
+                        <c:SettingRow Title="Tray page"
+                                      Description="The system tray's app icons, for when the taskbar is hidden, as with Seelen UI. Click an icon as you would in the tray; right-click for its menu.">
+                            <CheckBox x:Name="TrayPageToggle" Style="{StaticResource Toggle}"
+                                      Click="Toggle_Click"/>
+                        </c:SettingRow>
                     </StackPanel>
                 </Border>
 
