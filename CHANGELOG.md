@@ -2,7 +2,7 @@
 
 All notable changes to Notch. Versions follow [Semantic Versioning](https://semver.org); downloads are on the [Releases](https://github.com/Manish-Tamang/golesnotch/releases) page.
 
-## Unreleased
+## 0.5.0 — 2026-11-27
 
 ### Added
 
