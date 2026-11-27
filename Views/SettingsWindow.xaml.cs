@@ -58,6 +58,7 @@ public partial class SettingsWindow : Window
         NotificationsPageToggle.IsChecked = s.ShowNotificationsPage;
         TimerPageToggle.IsChecked = s.ShowTimerPage;
         DevicesPageToggle.IsChecked = s.ShowDevicesPage;
+        TrayPageToggle.IsChecked = s.ShowTrayPage;
         LyricsToggle.IsChecked = s.Lyrics;
         AlbumGlowToggle.IsChecked = s.AlbumGlow;
         NotificationPopupsToggle.IsChecked = s.NotificationPopups;
@@ -172,6 +173,7 @@ public partial class SettingsWindow : Window
             s.ShowNotificationsPage = NotificationsPageToggle.IsChecked == true;
             s.ShowTimerPage = TimerPageToggle.IsChecked == true;
             s.ShowDevicesPage = DevicesPageToggle.IsChecked == true;
+            s.ShowTrayPage = TrayPageToggle.IsChecked == true;
             s.Lyrics = LyricsToggle.IsChecked == true;
             s.AlbumGlow = AlbumGlowToggle.IsChecked == true;
             s.NotificationPopups = NotificationPopupsToggle.IsChecked == true;
