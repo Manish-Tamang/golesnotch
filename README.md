@@ -23,6 +23,7 @@ Written in C# with WPF. It runs natively, uses no web view, and has no dependenc
 - **Volume and brightness.** Change either and the notch shows the level on a bar you can drag or scroll. The Connections page has sliders for both, and the music page has a mute button. Brightness works with built-in laptop screens and with external monitors that support DDC/CI.
 - **Wi-Fi and Bluetooth.** Switch either on or off from the notch. The Bluetooth arrow opens your paired devices: connect or disconnect headphones and speakers, remove devices, and pair new ones without leaving the notch.
 - **Devices.** A popup when a USB drive, phone or Bluetooth device connects or disconnects; click it to open the device. The same page lists what is connected, with Open and Eject. Useful if you run without the taskbar tray.
+- **Tray.** For desktops without a taskbar, such as Seelen UI: a page with your system tray's app icons. Click one as you would in the tray, right-click it for its menu. Off by default; turn it on in Settings → Features.
 - **Settings window.** Style, width, gap, accent colour, hover or click to open, animation speed, and a switch for every feature.
 - **Stays on top, out of the way.** It keeps itself in front of other windows, never takes keyboard focus, doesn't appear in the taskbar or Alt+Tab, lets clicks through around the pill, and hides while a fullscreen app is in front.
 
@@ -102,6 +103,7 @@ Right-click the notch and choose **Settings**, or hover the page dots and click 
 | Notifications page | On | |
 | Focus timer page | On | |
 | Devices page | On | Wi-Fi and Bluetooth switches, and connected devices |
+| Tray page | Off | The system tray's app icons, for when the taskbar is hidden |
 | Lyrics | On | See Privacy below |
 | Album colour glow | On | Tints the notch with the cover's colour |
 | Notification popups | On | |
@@ -132,6 +134,7 @@ Settings are stored in `%APPDATA%\Notch\settings.json`, and the shelf's list of 
 - Connect and Disconnect are offered for Bluetooth headphones and speakers only; Windows connects mice, keyboards and phones by itself.
 - Devices that need a PIN typed on the PC (some keyboards and older devices) have to be paired in Windows Settings, because the notch doesn't take typing.
 - Brightness controls the built-in screen, or the primary monitor over DDC/CI. Monitors without DDC/CI, or with it turned off in their menu, can't be dimmed from the notch.
+- The tray page shows app icons only. Windows' own volume, network and battery icons are left out, since the notch has its own. While it's on, Notch sits between apps and Explorer's tray and passes everything on, so Explorer's tray keeps working.
 - The shelf takes files. Text or images dragged from a web page that aren't files are ignored.
 - Dragging a file from the shelf into a folder on the same drive moves it, as it does in Explorer; it then leaves the shelf.
 
