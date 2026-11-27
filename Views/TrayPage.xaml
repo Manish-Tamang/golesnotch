@@ -1,0 +1,28 @@
+<v:NotchPage x:Class="Notch.Views.TrayPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:v="clr-namespace:Notch.Views">
+    <Grid VerticalAlignment="Top">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="42"/>    <!-- title, and the name of the icon under the pointer -->
+            <RowDefinition Height="Auto"/>  <!-- the icons -->
+        </Grid.RowDefinitions>
+
+        <Grid Margin="20,12,20,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Tray" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+            <TextBlock x:Name="HintText" Grid.Column="1" FontSize="12" Margin="16,0,0,0"
+                       HorizontalAlignment="Right" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                       Foreground="{StaticResource MutedBrush}"/>
+        </Grid>
+
+        <WrapPanel x:Name="IconRow" Grid.Row="1" Margin="14,0,14,12"/>
+
+        <TextBlock x:Name="EmptyText" Grid.Row="1" Margin="20,4,20,16" FontSize="12.5"
+                   Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"
+                   Text="No tray icons right now."/>
+    </Grid>
+</v:NotchPage>
