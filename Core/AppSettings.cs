@@ -38,6 +38,11 @@ public sealed class AppSettings
     public bool ShowDevicesPage { get; set; } = true;
     /// <summary>A page that holds files dragged onto the notch.</summary>
     public bool ShowShelfPage { get; set; } = true;
+    /// <summary>
+    /// The system tray's icons, for when the taskbar is hidden (Seelen UI and other shells).
+    /// Off by default: while on, Notch receives the tray before Explorer does.
+    /// </summary>
+    public bool ShowTrayPage { get; set; }
     public bool Lyrics { get; set; } = true;
     /// <summary>Tints the notch with the album cover's colour while music shows.</summary>
     public bool AlbumGlow { get; set; } = true;
