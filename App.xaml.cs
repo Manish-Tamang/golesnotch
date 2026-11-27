@@ -12,6 +12,7 @@ namespace Notch;
 public partial class App : Application
 {
     Mutex? _singleInstance;
+    AppServices? _services;
 
     static App()
     {
@@ -34,6 +35,7 @@ public partial class App : Application
         DispatcherUnhandledException += OnUnhandledException;
 
         var services = new AppServices();
+        _services = services;
         Theme.ApplyAccent(services.Settings.Current.Accent);
 
         var notch = new NotchWindow(services);
@@ -45,6 +47,8 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        // Give the tray back to Explorer so apps re-add their icons there.
+        _services?.Tray.Stop();
         _singleInstance?.Dispose();
         base.OnExit(e);
     }
