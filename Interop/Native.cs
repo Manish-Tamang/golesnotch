@@ -102,6 +102,9 @@ static class Native
         return ok;
     }
 
+    [DllImport("user32.dll")]
+    public static extern uint GetDoubleClickTime();
+
     delegate void WinEventProc(IntPtr hook, uint eventType, IntPtr hwnd, int idObject, int idChild,
                                uint eventThread, uint eventTime);
 
