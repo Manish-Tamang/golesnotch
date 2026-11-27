@@ -59,6 +59,7 @@ public partial class NotchWindow : Window
     readonly TimerPage _timer;
     readonly DevicesPage _devices;
     readonly ShelfPage _shelf;
+    readonly TrayPage _tray;
     readonly NotchPage[] _allPages;
     readonly HudBanner _banner = new();
     readonly NotificationCard _hudCard = new();
@@ -137,7 +138,12 @@ public partial class NotchWindow : Window
         _timer = new TimerPage(app);
         _devices = new DevicesPage(app);
         _shelf = new ShelfPage(app);
-        _allPages = new NotchPage[] { _music, _shelf, _notifications, _timer, _devices };
+        _tray = new TrayPage(app);
+        _tray.IconActivated += () =>
+        {
+            if (_mode == Mode.Expanded) SetMode(Mode.Collapsed);
+        };
+        _allPages = new NotchPage[] { _music, _shelf, _notifications, _timer, _devices, _tray };
         foreach (var page in _allPages)
         {
             page.RenderTransform = new TranslateTransform();
@@ -483,6 +489,11 @@ public partial class NotchWindow : Window
         if (Settings.ShowNotificationsPage) wanted.Add(_notifications);
         if (Settings.ShowTimerPage) wanted.Add(_timer);
         if (Settings.ShowDevicesPage) wanted.Add(_devices);
+        if (Settings.ShowTrayPage) wanted.Add(_tray);
+
+        if (Settings.ShowTrayPage) _app.Tray.Start();
+        else _app.Tray.Stop();
+
         if (wanted.SequenceEqual(_pages)) return;
 
         var current = _pages.Count > 0 ? CurrentPage : _music;
