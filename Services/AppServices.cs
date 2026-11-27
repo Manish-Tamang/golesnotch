@@ -26,6 +26,7 @@ public sealed class AppServices
     public ShelfService Shelf { get; } = new();
     public BrightnessService Brightness { get; } = new();
     public BluetoothService Bluetooth { get; } = new();
+    public TrayIconService Tray { get; } = new();
 
     /// <summary>Starts the services that watch Windows. Call from the UI thread.</summary>
     public async Task StartAsync()
