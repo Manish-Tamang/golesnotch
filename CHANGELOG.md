@@ -2,6 +2,12 @@
 
 All notable changes to Notch. Versions follow [Semantic Versioning](https://semver.org); downloads are on the [Releases](https://github.com/Manish-Tamang/golesnotch/releases) page.
 
+## Unreleased
+
+### Added
+
+- **Tray page.** For desktops that hide the taskbar, such as Seelen UI, the open notch can show your system tray's app icons. Click an icon as you would in the tray; right-click it for its menu. Off by default; turn it on in Settings → Features. Uses [ManagedShell](https://github.com/cairoshell/ManagedShell) (Apache-2.0).
+
 ## 0.4.0 — 2026-11-24
 
 ### Added
