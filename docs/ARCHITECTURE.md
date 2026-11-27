@@ -66,6 +66,10 @@ A page is a `UserControl` that derives from `Views/NotchPage`. It reports how bi
 
 Windows has no public API to connect a paired pair of headphones. `Interop/BluetoothAudio` does what Windows' own Connect button does: each Bluetooth audio endpoint leads, through its device topology, to the driver's kernel-streaming filter, which accepts a one-shot reconnect or disconnect request. Endpoints are matched to Bluetooth devices by the container id they share.
 
+### The tray
+
+Shells such as Seelen UI hide the taskbar, and the tray goes with it. `Services/TrayIconService` uses ManagedShell's `NotificationArea`: it registers its own hidden `Shell_TrayWnd` window above Explorer's and broadcasts `TaskbarCreated`, so every app re-adds its icons and later updates go to Notch first. Each message is forwarded to Explorer's tray afterwards, so Explorer keeps working. `Views/TrayPage` sends clicks back to each app the way Explorer would, and closes the notch after a click so the app's menu isn't covered by the island. A left click waits one double-click time first. Stopping the service (the setting is off, or the app exits) destroys the window and broadcasts `TaskbarCreated` again, handing the icons back to Explorer.
+
 ### Adding a page
 
 1. Create `Views/MyPage.xaml` with `<v:NotchPage ...>` as its root, and `MyPage.xaml.cs` deriving from `NotchPage`. Take `AppServices` in the constructor.
@@ -92,6 +96,7 @@ Services live in `Services/` and know nothing about the UI. `AppServices` create
 | `StartupRegistration` | The registry's Run key | Per user; no admin rights. |
 | `ShelfService` | `shelf.json` | The file shelf's paths. UI thread only. |
 | `BrightnessService` | WMI (`WmiMonitorBrightness`), or DDC/CI (`Interop/MonitorBrightness`) | The built-in screen's brightness and its change events; the primary external monitor otherwise. Rapid changes from a drag are coalesced. |
+| `TrayIconService` | ManagedShell's `NotificationArea` | The system tray's app icons, while the tray page is on. UI thread only. |
 | `BluetoothService` | `DeviceWatcher` over Bluetooth association endpoints | Paired devices, and nearby ones while the Add device list is open. Pairs (with code confirmation), unpairs, and connects or disconnects audio devices through `Interop/BluetoothAudio`. |
 
 Services may raise events on any thread. Views always switch to the UI thread with `Dispatcher.InvokeAsync` before touching controls.
